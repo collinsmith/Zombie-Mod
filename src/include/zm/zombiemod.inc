@@ -3,6 +3,8 @@
 #endif
 #define _zombiemod_included
 
+#pragma reqlib zombiemod
+
 #include "inc\templates\extension_t.inc"
 #include "inc\zm_const.inc"
 #include "inc\zm_stocks.inc"
@@ -36,7 +38,7 @@ Natives
  * @param messageFmt	The message to log
  * @param ...			params
  */
-native zm_log(LOG_LEVEL:level, const message[], any:...);
+native zm_log(ZM_LOG_LEVEL:level, const message[], any:...);
 
 /**
  * Registers an extension into ZM with the specified name, description and version. Extensions

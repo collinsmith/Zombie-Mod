@@ -28,6 +28,11 @@ stock const ZM_EXT:Invalid_Extension = ZM_EXT:0;
  */
 enum extension_t {
 	/**
+	 * Plugin index which registered this extension
+	 */
+	ext_PluginId,
+
+	/**
 	 * Name of this extension.
 	 */
 	ext_Name[ext_Name_length+1],

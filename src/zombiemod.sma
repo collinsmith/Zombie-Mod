@@ -41,6 +41,16 @@ static ZM_LOG_LEVEL:g_logLevel;
 static Array:g_extensionsList = Invalid_Array;
 static g_numExtensions;
 
+public plugin_natives() {
+	register_library("zombiemod");
+	
+	register_native("zm_log", "_log", 0);
+	
+	register_native("zm_registerExtension", "_registerExtension", 0);
+	register_native("zm_getExtensionsList", "_getExtensionsList", 0);
+	register_native("zm_getNumExtensions", "_getNumExtensions", 0);
+}
+
 public plugin_precache() {
 	register_plugin(ZM_NAME, ZM_VERSION_STRING, "Tirant");
 	
@@ -192,7 +202,7 @@ fw_initialize() {
 	g_fw[fwPluginInit] = 0;
 }
 
-log(ZM_LOG_LEVEL:level, const string[], any:...) {
+log(ZM_LOG_LEVEL:level, string[], any:...) {
 	if (g_logLevel < level || level <= ZM_LOG_LEVEL_NONE) {
 		return;
 	}
@@ -203,7 +213,7 @@ log(ZM_LOG_LEVEL:level, const string[], any:...) {
 	g_szLogBuffer[length++] = ']';
 	g_szLogBuffer[length++] = ' ';
 	length += vformat(g_szLogBuffer[length], LOG_BUFFER_LENGTH-length, string, 3);
-	g_szLogBuffer[length++] = EOS;
+	g_szLogBuffer[length] = EOS;
 	log_to_file(g_szLogFilePath, g_szLogBuffer);
 }
 
@@ -227,7 +237,9 @@ public printExtensions(id) {
 	new extension[extension_t];
 	for (new i = 0; i < g_numExtensions; i++) {
 		ArrayGetArray(g_extensionsList, i, extension);
-		console_print(id, "%d. %s %s", i+1, extension[ext_Name], extension[ext_Version]);
+		new szStatus[16];
+		get_plugin(extension[ext_PluginId], _, _, _, _, _, _, _, _, szStatus, 15);
+		console_print(id, "%d. %s %s [%s]", i+1, extension[ext_Name], extension[ext_Version], szStatus);
 	}
 	
 	console_print(id, "%d plugins loaded", g_numExtensions);
@@ -238,16 +250,31 @@ public printExtensions(id) {
 Natives
 ***************************************************************************************************/
 
-// native zm_log(LOG_LEVEL:level, const message[], any:...);
+// native zm_log(ZM_LOG_LEVEL:level, const messageFmt[], any:...);
 public _log(pluginId, numParams) {
 	if (numParams < 2) {
 		zm_paramError(2,numParams);
 		return;
 	}
 	
-	new length = vdformat(g_szLogBuffer, LOG_BUFFER_LENGTH, 2, 3);
+	// I am seeing an issue using this code. In the meantime I am going to just use the code from
+	// the method directly instead of introducing another buffer
+	/*new length = vdformat(g_szLogBuffer, LOG_BUFFER_LENGTH, 2, 3);
 	g_szLogBuffer[length] = EOS;
-	log(ZM_LOG_LEVEL:get_param(1), g_szLogBuffer);
+	log(ZM_LOG_LEVEL:get_param(1), g_szLogBuffer);*/
+	new ZM_LOG_LEVEL:level = ZM_LOG_LEVEL:get_param(1);
+	if (g_logLevel < level || level <= ZM_LOG_LEVEL_NONE) {
+		return;
+	}
+
+	new length = 0;
+	g_szLogBuffer[length++] = '[';
+	length += copy(g_szLogBuffer[length], LOG_BUFFER_LENGTH-length, ZM_LOG_LEVEL_NAMES[any:level]);
+	g_szLogBuffer[length++] = ']';
+	g_szLogBuffer[length++] = ' ';
+	length += vdformat(g_szLogBuffer[length], LOG_BUFFER_LENGTH, 2, 3);
+	g_szLogBuffer[length] = EOS;
+	log_to_file(g_szLogFilePath, g_szLogBuffer);
 }
 
 // native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");
@@ -257,15 +284,15 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 		return Invalid_Extension;
 	}
 	
-	if (g_fw[fwPluginInit] == 0) {
+	if (g_extensionsList == Invalid_Array) {
 		log_error(AMX_ERR_NATIVE, "Cannot register extensions yet!");
 		return Invalid_Extension;
 	}
 	
 	new extension[extension_t];
 	get_string(1, extension[ext_Name], ext_Name_length);
-	get_string(2, extension[ext_Desc], ext_Desc_length);
-	get_string(3, extension[ext_Version], ext_Version_length);
+	get_string(2, extension[ext_Version], ext_Version_length);
+	get_string(3, extension[ext_Desc], ext_Desc_length);
 	
 	new ZM_EXT:extId = ZM_EXT:ArrayPushArray(g_extensionsList, extension);
 	g_numExtensions++;

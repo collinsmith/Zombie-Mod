@@ -24,3 +24,11 @@ Macros
  */
 #define zm_paramError(%1,%2)\
 	log_error(AMX_ERR_PARAMS,"Expected %d parameters,found %d",%1,%2)
+	
+/**
+ * Macro to test whether or not a given player index is valid (i.e., id elementof [1,32]).
+ * 
+ * @param %1		Player index to test
+ */
+#define zm_isValidPlayerId(%1)\
+	(1<=%1&&%1<=32)

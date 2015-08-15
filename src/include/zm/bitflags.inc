@@ -52,4 +52,4 @@
 * @see getFlag
 */
 #define isFlagSet(%1,%2)\
-	(getFlag(%1, %2) != 0
+	(getFlag(%1,%2) != 0)
