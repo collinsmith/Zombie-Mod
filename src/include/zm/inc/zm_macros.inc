@@ -22,8 +22,8 @@ Macros
  * @param %1		Number of parameters expected
  * @param %2		Number of parameters found
  */
-#define zm_paramError(%1,%2)\
-	log_error(AMX_ERR_PARAMS,"Expected %d parameters,found %d",%1,%2)
+#define zm_paramError(%1,%2,%3)\
+	log_error(AMX_ERR_PARAMS,"[%s] Expected %d parameters, found %d",%1,%2,%3)
 	
 /**
  * Macro to test whether or not a given player index is valid (i.e., id elementof [1,32]).

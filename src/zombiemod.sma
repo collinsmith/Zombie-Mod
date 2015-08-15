@@ -253,7 +253,7 @@ Natives
 // native zm_log(ZM_LOG_LEVEL:level, const messageFmt[], any:...);
 public _log(pluginId, numParams) {
 	if (numParams < 2) {
-		zm_paramError(2,numParams);
+		zm_paramError("zm_log",2,numParams);
 		return;
 	}
 	
@@ -280,7 +280,7 @@ public _log(pluginId, numParams) {
 // native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");
 public ZM_EXT:_registerExtension(pluginId, numParams) {
 	if (numParams != 3) {
-		zm_paramError(3,numParams);
+		zm_paramError("zm_registerExtension",3,numParams);
 		return Invalid_Extension;
 	}
 	
@@ -307,7 +307,7 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 // native Array:zm_getExtensionsList();
 public Array:_getExtensionsList(pluginId, numParams) {
 	if (numParams != 0) {
-		zm_paramError(0,numParams);
+		zm_paramError("zm_getExtensionsList",0,numParams);
 		return Invalid_Array;
 	}
 	
@@ -321,7 +321,7 @@ public Array:_getExtensionsList(pluginId, numParams) {
 // native zm_getNumExtensions();
 public _getNumExtensions(pluginId, numParams) {
 	if (numParams != 0) {
-		zm_paramError(0,numParams);
+		zm_paramError("zm_getNumExtensions",0,numParams);
 		return 0;
 	}
 	

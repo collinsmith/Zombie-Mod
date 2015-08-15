@@ -96,6 +96,7 @@ initializeForwards() {
 	zm_log(ZM_LOG_LEVEL_DEBUG, "Initializing zm_teammanager forwards");
 #endif
 
+	g_fw[fwRefresh]	= CreateMultiForward("zm_fw_refresh", ET_IGNORE, FP_CELL, FP_CELL);
 	g_fw[fwPlayerSpawn] = CreateMultiForward("zm_fw_playerSpawn", ET_IGNORE, FP_CELL, FP_CELL);
 	g_fw[fwPlayerDeath] = CreateMultiForward("zm_fw_playerDeath", ET_IGNORE, FP_CELL, FP_CELL);
 	g_fw[fwBlockTeamChange] = CreateMultiForward("zm_fw_blockTeamChange", ET_IGNORE, FP_CELL);
@@ -188,7 +189,7 @@ bool:isUserHuman(id) {
 }
 
 ZM_CHANGE_STATE:infectUser(id, infector = -1, bool:blockable = true) {
-	ExecuteForward(g_fw[fwUserInfectPre], g_fw[fwReturn], id, infector);
+	ExecuteForward(g_fw[fwUserInfectPre], g_fw[fwReturn], id, infector, blockable);
 	if (blockable && g_fw[fwReturn] == any:ZM_RET_BLOCK) {
 		return;
 	}
@@ -206,7 +207,7 @@ ZM_CHANGE_STATE:infectUser(id, infector = -1, bool:blockable = true) {
 #if defined ZM_DEBUG_MODE
 	new szIdName[32];
 	get_user_name(id, szIdName, 31);
-	if (zm_isValidPlayerId(id)) {
+	if (zm_isValidPlayerId(infector)) {
 		new szInfectorName[32];
 		get_user_name(infector, szInfectorName, 31);
 		zm_log(ZM_LOG_LEVEL_DEBUG, "%s infected %s", szInfectorName, szIdName);
@@ -217,7 +218,7 @@ ZM_CHANGE_STATE:infectUser(id, infector = -1, bool:blockable = true) {
 }
 
 ZM_CHANGE_STATE:cureUser(id, curer = -1, bool:blockable = true) {
-	ExecuteForward(g_fw[fwUserCurePre], g_fw[fwReturn], id, curer);
+	ExecuteForward(g_fw[fwUserCurePre], g_fw[fwReturn], id, curer, blockable);
 	if (blockable && g_fw[fwReturn] == any:ZM_RET_BLOCK) {
 		return;
 	}
@@ -235,7 +236,7 @@ ZM_CHANGE_STATE:cureUser(id, curer = -1, bool:blockable = true) {
 #if defined ZM_DEBUG_MODE
 	new szIdName[32];
 	get_user_name(id, szIdName, 31);
-	if (zm_isValidPlayerId(id)) {
+	if (zm_isValidPlayerId(curer)) {
 		new szCurerName[32];
 		get_user_name(curer, szCurerName, 31);
 		zm_log(ZM_LOG_LEVEL_DEBUG, "%s cured %s", szCurerName, szIdName);
@@ -364,7 +365,7 @@ Natives
 // native zm_respawnUser(id, bool:force = false);
 public _respawnUser(pluginId, numParams) {
 	if (numParams != 2) {
-		zm_paramError(2,numParams);
+		zm_paramError("zm_respawnUser",2,numParams);
 		return;
 	}
 	
@@ -380,7 +381,7 @@ public _respawnUser(pluginId, numParams) {
 // native ZM_CHANGE_STATE:zm_infectUser(id, infector = -1, bool:blockable = true);
 public ZM_CHANGE_STATE:_infectUser(pluginId, numParams) {
 	if (numParams != 3) {
-		zm_paramError(3,numParams);
+		zm_paramError("zm_infectUser",3,numParams);
 		return ZM_CHANGE_STATE:ZM_RET_ERROR;
 	}
 	
@@ -406,7 +407,7 @@ public ZM_CHANGE_STATE:_infectUser(pluginId, numParams) {
 // native ZM_CHANGE_STATE:zm_cureUser(id, curer = -1, bool:blockable = true);
 public ZM_CHANGE_STATE:_cureUser(pluginId, numParams) {
 	if (numParams != 3) {
-		zm_paramError(3,numParams);
+		zm_paramError("zm_cureUser",3,numParams);
 		return ZM_CHANGE_STATE:ZM_RET_ERROR;
 	}
 	
@@ -432,7 +433,7 @@ public ZM_CHANGE_STATE:_cureUser(pluginId, numParams) {
 // native bool:zm_isUserConnected(id);
 public bool:_isUserConnected(pluginId, numParams) {
 	if (numParams != 1) {
-		zm_paramError(1,numParams);
+		zm_paramError("zm_isUserConnected",1,numParams);
 		return false;
 	}
 	
@@ -448,7 +449,7 @@ public bool:_isUserConnected(pluginId, numParams) {
 // native bool:zm_isUserAlive(id);
 public bool:_isUserAlive(pluginId, numParams) {
 	if (numParams != 1) {
-		zm_paramError(1,numParams);
+		zm_paramError("zm_isUserAlive",1,numParams);
 		return false;
 	}
 	
@@ -464,7 +465,7 @@ public bool:_isUserAlive(pluginId, numParams) {
 // native bool:zm_isUserZombie(id);
 public bool:_isUserZombie(pluginId, numParams) {
 	if (numParams != 1) {
-		zm_paramError(1,numParams);
+		zm_paramError("zm_isUserZombie",1,numParams);
 		return false;
 	}
 	
@@ -480,7 +481,7 @@ public bool:_isUserZombie(pluginId, numParams) {
 // native bool:zm_isUserHuman(id);
 public bool:_isUserHuman(pluginId, numParams) {
 	if (numParams != 1) {
-		zm_paramError(1,numParams);
+		zm_paramError("zm_isUserHuman",1,numParams);
 		return false;
 	}
 	
@@ -496,7 +497,7 @@ public bool:_isUserHuman(pluginId, numParams) {
 // native zm_fixInfection(id);
 public bool:_fixInfection(pluginId, numParams) {
 	if (numParams != 1) {
-		zm_paramError(1,numParams);
+		zm_paramError("zm_fixInfection",1,numParams);
 		return;
 	}
 	
