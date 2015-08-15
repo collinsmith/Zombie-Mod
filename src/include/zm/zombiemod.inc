@@ -18,13 +18,23 @@ Forwards
  * Called before the initialization of ZM. This forward is intended to be used to initialize all
  * data structures upon which other extensions may rely.
  */
-forward zm_fw_initStructs();
+forward zm_onInitStructs();
 
 /**
  * Called after ZM has been initialized. This forward is intended to be used to register plugins
  * and perform other initializations that were not performed in zm_fw_initStructs.
  */
-forward zm_fw_init();
+forward zm_onInit();
+
+/**
+ * Called when an extension is registered.
+ * 
+ * @param extension		Extension identifier of the extension
+ * @param name			Name of the extension
+ * @param desc			Brief description of the extension
+ * @param version		Version string for the extension		
+ */
+forward zm_onExtensionRegistered(ZM_EXT:extension, const name[], const version[], const description[]);
 
 /***************************************************************************************************
 Natives

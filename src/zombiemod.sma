@@ -26,8 +26,9 @@ static const ZM_LOG_LEVEL_NAMES[ZM_LOG_LEVEL_length][] = {
 
 enum _:FORWARDS_length {
 	fwReturn,
-	fwPluginInitStructs,
-	fwPluginInit
+	onInitStructs,
+	onInit,
+	onExtensionRegistered
 };
 
 static g_szLogBuffer[LOG_BUFFER_LENGTH+1];
@@ -178,28 +179,29 @@ configureModName() {
 initializeForwards() {
 	fw_initializeStructs();
 	fw_initialize();
+	g_fw[onExtensionRegistered] = CreateMultiForward("zm_onExtensionRegistered", ET_IGNORE, FP_CELL, FP_ARRAY, FP_ARRAY, FP_ARRAY);
 }
 
 fw_initializeStructs() {
 #if defined ZM_DEBUG_MODE
-	log(ZM_LOG_LEVEL_DEBUG, "zm_fw_initStructs");
+	log(ZM_LOG_LEVEL_DEBUG, "zm_onInitStructs");
 #endif
 	
-	g_fw[fwPluginInitStructs] = CreateMultiForward("zm_fw_initStructs", ET_IGNORE);
-	ExecuteForward(g_fw[fwPluginInitStructs], g_fw[fwReturn]);
-	DestroyForward(g_fw[fwPluginInitStructs]);
-	g_fw[fwPluginInitStructs] = 0;
+	g_fw[onInitStructs] = CreateMultiForward("zm_onInitStructs", ET_IGNORE);
+	ExecuteForward(g_fw[onInitStructs], g_fw[fwReturn]);
+	DestroyForward(g_fw[onInitStructs]);
+	g_fw[onInitStructs] = 0;
 }
 
 fw_initialize() {
 #if defined ZM_DEBUG_MODE
-	log(ZM_LOG_LEVEL_DEBUG, "zm_fw_init");
+	log(ZM_LOG_LEVEL_DEBUG, "zm_onInit");
 #endif
 
-	g_fw[fwPluginInit] = CreateMultiForward("zm_fw_init", ET_IGNORE);
-	ExecuteForward(g_fw[fwPluginInit], g_fw[fwReturn]);
-	DestroyForward(g_fw[fwPluginInit]);
-	g_fw[fwPluginInit] = 0;
+	g_fw[onInit] = CreateMultiForward("zm_onInit", ET_IGNORE);
+	ExecuteForward(g_fw[onInit], g_fw[fwReturn]);
+	DestroyForward(g_fw[onInit]);
+	g_fw[onInit] = 0;
 }
 
 log(ZM_LOG_LEVEL:level, string[], any:...) {
@@ -300,7 +302,8 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 #if defined ZM_DEBUG_MODE
 	log(ZM_LOG_LEVEL_DEBUG, "Registered extension: %s", extension[ext_Name]);
 #endif
-	
+
+	ExecuteForward(g_fw[onExtensionRegistered], g_fw[fwReturn], extId, extension[ext_Name], extension[ext_Version], extension[ext_Desc]);
 	return extId;
 }
 

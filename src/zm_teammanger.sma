@@ -14,12 +14,12 @@
 
 enum _:FORWARDS_length {
 	fwReturn,
-	fwPlayerDeath,
-	fwPlayerSpawn,
-	fwBlockTeamChange,
-	fwUserInfectPre, fwUserInfect, fwUserInfectPost,
-	fwUserCurePre, fwUserCure, fwUserCurePost,
-	fwRefresh
+	onPlayerDeath,
+	onPlayerSpawn,
+	onTeamChangeBlocked,
+	onBeforeInfected, onInfected, onAfterInfected,
+	onBeforeCured, onCured, onAfterCured,
+	onRefresh
 };
 
 enum playerFlags_t {
@@ -75,8 +75,8 @@ public ham_PlayerSpawn_Post(id) {
 	
 	setFlag(g_playerFlag[flag_Alive],id);
 	new bool:isZombie = isUserZombie(id);
-	ExecuteForward(g_fw[fwRefresh], g_fw[fwReturn], id, isZombie);
-	ExecuteForward(g_fw[fwPlayerSpawn], g_fw[fwReturn], id, isZombie);
+	ExecuteForward(g_fw[onRefresh], g_fw[fwReturn], id, isZombie);
+	ExecuteForward(g_fw[onPlayerSpawn], g_fw[fwReturn], id, isZombie);
 	return HAM_HANDLED;
 }
 
@@ -87,7 +87,7 @@ public ham_PlayerKilled(killer, victim, shouldgib) {
 	
 	hideMenus(victim);
 	unsetFlag(g_playerFlag[flag_Alive],victim);
-	ExecuteForward(g_fw[fwPlayerDeath], g_fw[fwReturn], killer, victim);
+	ExecuteForward(g_fw[onPlayerDeath], g_fw[fwReturn], killer, victim);
 	return HAM_HANDLED;
 }
 
@@ -96,24 +96,24 @@ initializeForwards() {
 	zm_log(ZM_LOG_LEVEL_DEBUG, "Initializing zm_teammanager forwards");
 #endif
 
-	g_fw[fwRefresh]	= CreateMultiForward("zm_fw_refresh", ET_IGNORE, FP_CELL, FP_CELL);
-	g_fw[fwPlayerSpawn] = CreateMultiForward("zm_fw_playerSpawn", ET_IGNORE, FP_CELL, FP_CELL);
-	g_fw[fwPlayerDeath] = CreateMultiForward("zm_fw_playerDeath", ET_IGNORE, FP_CELL, FP_CELL);
-	g_fw[fwBlockTeamChange] = CreateMultiForward("zm_fw_blockTeamChange", ET_IGNORE, FP_CELL);
+	g_fw[onRefresh]	= CreateMultiForward("zm_onRefresh", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onPlayerSpawn] = CreateMultiForward("zm_onPlayerSpawn", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onPlayerDeath] = CreateMultiForward("zm_onPlayerDeath", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onTeamChangeBlocked] = CreateMultiForward("zm_onTeamChangeBlocked", ET_IGNORE, FP_CELL);
 	initializeInfectForwards();
 	initializeCureForwards();
 }
 
 initializeInfectForwards() {
-	g_fw[fwUserInfectPre] = CreateMultiForward("zm_fw_infect_pre", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL);
-	g_fw[fwUserInfect] = CreateMultiForward("zm_fw_infect", ET_IGNORE, FP_CELL, FP_CELL);
-	g_fw[fwUserInfectPost] = CreateMultiForward("zm_fw_infect_post", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onBeforeInfected] = CreateMultiForward("zm_onBeforeInfected", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL);
+	g_fw[onInfected] = CreateMultiForward("zm_onInfected", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onAfterInfected] = CreateMultiForward("zm_onAfterInfected", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
 initializeCureForwards() {
-	g_fw[fwUserCurePre] = CreateMultiForward("zm_fw_cure_pre", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL);
-	g_fw[fwUserCure] = CreateMultiForward("zm_fw_cure", ET_IGNORE, FP_CELL, FP_CELL);
-	g_fw[fwUserCurePost] = CreateMultiForward("zm_fw_cure_post", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onBeforeCured] = CreateMultiForward("zm_onBeforeCured", ET_CONTINUE, FP_CELL, FP_CELL, FP_CELL);
+	g_fw[onCured] = CreateMultiForward("zm_onCured", ET_IGNORE, FP_CELL, FP_CELL);
+	g_fw[onAfterCured] = CreateMultiForward("zm_onAfterCured", ET_IGNORE, FP_CELL, FP_CELL);
 }
 
 blockTeamChangeCommands() {
@@ -127,7 +127,7 @@ public blockTeamChange(id) {
 		return PLUGIN_CONTINUE;
 	}
 	
-	ExecuteForward(g_fw[fwBlockTeamChange], g_fw[fwReturn], id);
+	ExecuteForward(g_fw[onTeamChangeBlocked], g_fw[fwReturn], id);
 	return PLUGIN_HANDLED;
 }
 
@@ -189,20 +189,20 @@ bool:isUserHuman(id) {
 }
 
 ZM_CHANGE_STATE:infectUser(id, infector = -1, bool:blockable = true) {
-	ExecuteForward(g_fw[fwUserInfectPre], g_fw[fwReturn], id, infector, blockable);
+	ExecuteForward(g_fw[onBeforeInfected], g_fw[fwReturn], id, infector, blockable);
 	if (blockable && g_fw[fwReturn] == any:ZM_RET_BLOCK) {
 		return;
 	}
 	
 	hideMenus(id);
-	ExecuteForward(g_fw[fwUserInfect], g_fw[fwReturn], id, infector);
+	ExecuteForward(g_fw[onInfected], g_fw[fwReturn], id, infector);
 	
 	setFlag(g_playerFlag[flag_Zombie],id);
 	cs_set_team(id, CSTeam:ZM_TEAM_ZOMBIE);
 	//cs_set_player_weap_restrict(id, true, ZOMBIE_ALLOWED_WEAPONS, ZOMBIE_DEFAULT_WEAPON);
-	ExecuteForward(g_fw[fwRefresh], g_fw[fwReturn], id, true);
+	ExecuteForward(g_fw[onRefresh], g_fw[fwReturn], id, true);
 	
-	ExecuteForward(g_fw[fwUserInfectPost], g_fw[fwReturn], id, infector);
+	ExecuteForward(g_fw[onAfterInfected], g_fw[fwReturn], id, infector);
 	
 #if defined ZM_DEBUG_MODE
 	new szIdName[32];
@@ -218,20 +218,20 @@ ZM_CHANGE_STATE:infectUser(id, infector = -1, bool:blockable = true) {
 }
 
 ZM_CHANGE_STATE:cureUser(id, curer = -1, bool:blockable = true) {
-	ExecuteForward(g_fw[fwUserCurePre], g_fw[fwReturn], id, curer, blockable);
+	ExecuteForward(g_fw[onBeforeCured], g_fw[fwReturn], id, curer, blockable);
 	if (blockable && g_fw[fwReturn] == any:ZM_RET_BLOCK) {
 		return;
 	}
 	
 	hideMenus(id);
-	ExecuteForward(g_fw[fwUserCure], g_fw[fwReturn], id, curer);
+	ExecuteForward(g_fw[onCured], g_fw[fwReturn], id, curer);
 	
 	unsetFlag(g_playerFlag[flag_Zombie],id);
 	cs_set_team(id, CSTeam:ZM_TEAM_HUMAN);
 	//cs_set_player_weap_restrict(id, false, ZOMBIE_ALLOWED_WEAPONS, ZOMBIE_DEFAULT_WEAPON);
-	ExecuteForward(g_fw[fwRefresh], g_fw[fwReturn], id, false);
+	ExecuteForward(g_fw[onRefresh], g_fw[fwReturn], id, false);
 	
-	ExecuteForward(g_fw[fwUserCurePost], g_fw[fwReturn], id, curer);
+	ExecuteForward(g_fw[onAfterCured], g_fw[fwReturn], id, curer);
 	
 #if defined ZM_DEBUG_MODE
 	new szIdName[32];
@@ -396,7 +396,7 @@ public ZM_CHANGE_STATE:_infectUser(pluginId, numParams) {
 	}
 	
 	if (isUserZombie(id)) {
-		ExecuteForward(g_fw[fwRefresh], g_fw[fwReturn], id, true);
+		ExecuteForward(g_fw[onRefresh], g_fw[fwReturn], id, true);
 		return ZM_CANNOT_CHANGE;
 	}
 	
@@ -422,7 +422,7 @@ public ZM_CHANGE_STATE:_cureUser(pluginId, numParams) {
 	}
 	
 	if (isUserHuman(id)) {
-		ExecuteForward(g_fw[fwRefresh], g_fw[fwReturn], id, false);
+		ExecuteForward(g_fw[onRefresh], g_fw[fwReturn], id, false);
 		return ZM_CANNOT_CHANGE;
 	}
 	

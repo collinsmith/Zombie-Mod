@@ -17,7 +17,7 @@ Forwards
  * @param id			Player index calling event
  * @param isZombie		True if they are a zombie, otherwise false
  */
-forward zm_fw_refresh(id, bool:isZombie);
+forward zm_onRefresh(id, bool:isZombie);
 
 /**
  * Called when a player is about to be infected and change into a zombie. Returning ZM_RET_BLOCK
@@ -27,7 +27,7 @@ forward zm_fw_refresh(id, bool:isZombie);
  * @param infector		Player index infecting, -1 if no player (e.g., another extension)
  * @param blockable		True if returning ZM_RET_BLOCK will block this event, otherwise false
  */
-forward zm_fw_infect_pre(id, infector, bool:blockable);
+forward zm_onBeforeInfected(id, infector, bool:blockable);
 
 /**
  * Called when a player is going to be infected. This call cannot be blocked.
@@ -35,7 +35,7 @@ forward zm_fw_infect_pre(id, infector, bool:blockable);
  * @param id			Player index being infected
  * @param infector		Player index infecting, -1 if no player (e.g., another extension)
  */
-forward zm_fw_infect(id, infector);
+forward zm_onInfected(id, infector);
 
 /**
  * Called when a player has been infected and is now a zombie.
@@ -43,7 +43,7 @@ forward zm_fw_infect(id, infector);
  * @param id			Player index infected
  * @param infector		Player index infecting, -1 if no player (e.g., another extension)
  */
-forward zm_fw_infect_post(id, infector);
+forward zm_onAfterInfected(id, infector);
 
 /**
  * Called when a player is about to be cured and change into a human. Returning ZM_RET_BLOCK will
@@ -53,7 +53,7 @@ forward zm_fw_infect_post(id, infector);
  * @param curer			Player index curing, -1 if no player (e.g., another extension)
  * @param blockable		True if returning ZM_RET_BLOCK will block this event, otherwise false
  */
-forward zm_fw_cure_pre(id, curer, bool:blockable);
+forward zm_OnBeforeCured(id, curer, bool:blockable);
 
 /**
  * Called when a player is going to be cured. This call cannot be blocked.
@@ -61,7 +61,7 @@ forward zm_fw_cure_pre(id, curer, bool:blockable);
  * @param id			Player index being cured
  * @param curer			Player index curing, -1 if no player (e.g., another extension)
  */
-forward zm_fw_cure(id, curer);
+forward zm_onCured(id, curer);
 
 /**
  * Called when a player has been cured and is now a human.
@@ -69,7 +69,7 @@ forward zm_fw_cure(id, curer);
  * @param id			Player index cured
  * @param curer			Player index curing, -1 if no player (e.g., another extension)
  */
-forward zm_fw_cure_post(id, curer);
+forward zm_onAfterCured(id, curer);
 
 /**
  * Called when a player spawns.
@@ -77,7 +77,7 @@ forward zm_fw_cure_post(id, curer);
  * @param id			Player index spawning
  * @param isZombie		True if the player is a zombie, otherwise false
  */
-forward zm_fw_playerSpawn(id, bool:isZombie);
+forward zm_onPlayerSpawn(id, bool:isZombie);
 
 /**
  * Called when a player is killed.
@@ -85,7 +85,7 @@ forward zm_fw_playerSpawn(id, bool:isZombie);
  * @param killer		Player index who killed the victim
  * @param victim		Player index of dead player
  */
-forward zm_fw_playerDeath(killer, victim);
+forward zm_onPlayerDeath(killer, victim);
 
 /**
  * Called when a player uses the change team command and is blocked.
@@ -95,7 +95,7 @@ forward zm_fw_playerDeath(killer, victim);
  * 
  * @param id			Player index who tried to change teams
  */
-forward zm_fw_blockTeamChange(id);
+forward zm_onTeamChangeBlocked(id);
 
 /***************************************************************************************************
 Natives
