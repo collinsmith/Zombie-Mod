@@ -51,7 +51,7 @@ public plugin_natives() {
 	register_native("zm_fixInfection", "_fixInfection", 0);
 }
 
-public zm_fw_init() {
+public zm_onInit() {
 	zm_registerExtension("[ZM] Team Manager", PLUGIN_VERSION, "Controls who is a zombie and who isn't");
 	
 #if defined ZM_DEBUG_MODE

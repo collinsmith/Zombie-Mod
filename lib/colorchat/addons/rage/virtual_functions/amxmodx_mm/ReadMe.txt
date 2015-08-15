@@ -1,0 +1,1 @@
+If this folder doesn't exist, rage gonna throw an error (more a warning though).

@@ -177,9 +177,9 @@ configureModName() {
 }
 
 initializeForwards() {
+	g_fw[onExtensionRegistered] = CreateMultiForward("zm_onExtensionRegistered", ET_IGNORE, FP_CELL, FP_STRING, FP_STRING, FP_STRING);
 	fw_initializeStructs();
 	fw_initialize();
-	g_fw[onExtensionRegistered] = CreateMultiForward("zm_onExtensionRegistered", ET_IGNORE, FP_CELL, FP_ARRAY, FP_ARRAY, FP_ARRAY);
 }
 
 fw_initializeStructs() {

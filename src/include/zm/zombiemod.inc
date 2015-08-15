@@ -29,6 +29,8 @@ forward zm_onInit();
 /**
  * Called when an extension is registered.
  * 
+ * @note extension		This is the value which was returned when the extension was registered
+ * 
  * @param extension		Extension identifier of the extension
  * @param name			Name of the extension
  * @param desc			Brief description of the extension
