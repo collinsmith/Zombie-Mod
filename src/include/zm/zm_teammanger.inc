@@ -3,7 +3,9 @@
 #endif
 #define _teammanager_included
 
-#pragma reqlib zm_teammanger
+#if !defined ZM_DEBUG_MODE
+	#pragma reqlib zm_teammanger
+#endif
 
 #include "inc\zm_teammanger_const.inc"
 

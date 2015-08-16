@@ -23,7 +23,7 @@ stock zm_printColor(id, message[], any:...) {
 	static buffer[BUFFER_LENGTH+1];
 	static offset;
 	if (buffer[0] == EOS) {
-		offset = formatex(buffer, BUFFER_LENGTH, "^1[^3%s^1] ", ZM_NAME_SHORT);
+		offset = formatex(buffer, BUFFER_LENGTH, "[%s] ", ZM_NAME_SHORT);
 	}
 	
 	new length = offset;

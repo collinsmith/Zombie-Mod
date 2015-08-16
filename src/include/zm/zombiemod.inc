@@ -3,7 +3,9 @@
 #endif
 #define _zombiemod_included
 
-#pragma reqlib zombiemod
+#if !defined ZM_DEBUG_MODE
+	#pragma reqlib zombiemod
+#endif
 
 #include "inc\templates\extension_t.inc"
 #include "inc\zm_const.inc"

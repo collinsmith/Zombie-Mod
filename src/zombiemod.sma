@@ -44,7 +44,7 @@ static g_numExtensions;
 
 public plugin_natives() {
 	register_library("zombiemod");
-	
+
 	register_native("zm_log", "_log", 0);
 	
 	register_native("zm_registerExtension", "_registerExtension", 0);
@@ -54,7 +54,7 @@ public plugin_natives() {
 
 public plugin_precache() {
 	register_plugin(ZM_NAME, ZM_VERSION_STRING, "Tirant");
-	
+		
 	new cvarVersion = CvarRegister("zm_version", ZM_VERSION_STRING, "The current version of Zombie Mod being used", FCVAR_SPONLY);
 	CvarLockValue(cvarVersion, ZM_VERSION_STRING);
 	

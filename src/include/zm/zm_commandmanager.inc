@@ -3,8 +3,9 @@
 #endif
 #define _commandmanager_included
 
-#pragma reqlib zm_commandmanger
-#pragma reqlib zm_teammanager
+#if !defined ZM_DEBUG_MODE
+	#pragma reqlib zm_commandmanger
+#endif
 
 /***************************************************************************************************
 Forwards

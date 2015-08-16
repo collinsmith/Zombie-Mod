@@ -40,7 +40,7 @@ static g_fw[FORWARDS_length];
 
 public plugin_natives() {
 	register_library("zm_teammanager");
-	
+
 	register_native("zm_respawnUser", "_respawnUser", 0);
 	register_native("zm_infectUser", "_infectUser", 0);
 	register_native("zm_cureUser", "_cureUser", 0);
@@ -49,6 +49,9 @@ public plugin_natives() {
 	register_native("zm_isUserZombie", "_isUserZombie", 0);
 	register_native("zm_isUserHuman", "_isUserHuman", 0);
 	register_native("zm_fixInfection", "_fixInfection", 0);
+}
+
+public zm_onInitStructs() {
 }
 
 public zm_onInit() {

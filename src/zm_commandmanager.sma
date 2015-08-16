@@ -43,6 +43,14 @@ static g_cvar_prefixes;
 
 static g_szTemp[command_Prefix_length+command_Name_length+1];
 
+public plugin_natives() {
+	register_library("zm_commandmanager");
+
+	register_native("zm_registerCommand", "_registerCommand", 0);
+	register_native("zm_registerCommandAlias", "_registerCommandAlias", 0);
+	register_native("zm_getCommandByName", "_getCommandByName", 0);
+}
+
 public zm_onInitStructs() {
 	g_handleList = ArrayCreate(command_t, 8);
 	g_handleNames = ArrayCreate(1);
@@ -56,6 +64,7 @@ public zm_onInitStructs() {
 
 public zm_onInit() {
 	zm_registerExtension("[ZM] Command Manager", PLUGIN_VERSION, "Manages commands that players can use");
+	register_dictionary("zombiemod.txt");
 	
 	g_cvar_prefixes = CvarRegister("zm_command_prefixes", "/.!", "A list of all symbols that can preceed commands");
 	CvarHookChange(g_cvar_prefixes, "onPrefixesAltered", false);
@@ -73,9 +82,11 @@ public onPrefixesAltered(handleCvar, const oldValue[], const newValue[], const c
 #endif
 	TrieClear(g_prefixMap);
 	
-	new i;
+	new i = 0;
+	new szTemp[2];
 	while (newValue[i] != EOS) {
-		TrieSetCell(g_prefixMap, newValue[i], i);
+		szTemp[0] = newValue[i];
+		TrieSetCell(g_prefixMap, szTemp, i);
 		i++;
 	}
 }
@@ -159,7 +170,7 @@ tryExecutingCommand(ZM_CMD:command, id, bool:teamCommand, message[]) {
 	assert command != Invalid_Command;
 #endif
 	
-	ArrayGetArray(g_handleList, any:command, g_tempCommand);
+	ArrayGetArray(g_handleList, any:command-1, g_tempCommand);
 	
 	new flags = g_tempCommand[command_Flags];
 	if (!(flags&SAY_ALL) && !(flags&SAY_TEAM)) {
@@ -217,4 +228,99 @@ tryExecutingCommand(ZM_CMD:command, id, bool:teamCommand, message[]) {
 	ExecuteForward(g_fw[onCommand], g_fw[fwReturn], id, command);
 	
 	return PLUGIN_HANDLED;
+}
+
+/***************************************************************************************************
+Natives
+***************************************************************************************************/
+
+// native ZM_CMD:zm_registerCommand(const command[], const handle[], const flags[] = "abcdef", const description[] = "", const adminFlags = ADMIN_ALL);
+public ZM_CMD:_registerCommand(pluginId, numParams) {
+	if (numParams != 5) {
+		zm_paramError("zm_registerCommand",5,numParams);
+		return Invalid_Command;
+	}
+	
+	new i;
+	get_string(1, g_tempCommand[command_Name], command_Name_length);
+	strtolower(g_tempCommand[command_Name]);
+	if (TrieGetCell(g_handleMap, g_tempCommand[command_Name], i)) {
+		return Invalid_Command;
+	}
+	
+	new szHandle[32];
+	get_string(2, szHandle, 31);
+
+	new Trie:tempTrie;
+	tempTrie = ArrayGetCell(g_handleNames, pluginId);
+	if (TrieGetCell(tempTrie, szHandle, i)) {
+		TrieSetCell(g_handleMap, g_tempCommand[command_Name], i);
+		return ZM_CMD:i;
+	} else {
+		new szPluginName[32];
+		get_plugin(pluginId, szPluginName, 31);
+		g_tempCommand[command_FuncID] = get_func_id(szHandle, pluginId);
+		if (g_tempCommand[command_FuncID] < 0) {
+			log_error(AMX_ERR_NATIVE, "Function handle '%s' does not exist within plugin '%s'", szHandle, szPluginName);
+			return Invalid_Command;
+		}
+		
+		ArraySetCell(g_handleNames, pluginId, tempTrie);
+
+		g_tempCommand[command_PluginID] = pluginId;
+		
+		new szFlags[8];
+		get_string(3, szFlags, 7);
+		g_tempCommand[command_Flags] = read_flags(szFlags);
+		get_string(4, g_tempCommand[command_Desc], command_Desc_length);
+		g_tempCommand[command_AdminFlags] = get_param(5);
+		
+		new ZM_CMD:cmdId = ZM_CMD:(ArrayPushArray(g_handleList, g_tempCommand)+1);
+		TrieSetCell(tempTrie, szHandle, cmdId);
+		TrieSetCell(g_handleMap, g_tempCommand[command_Name], cmdId);
+		g_numHandles++;
+		
+#if defined ZM_DEBUG_MODE
+		zm_log(ZM_LOG_LEVEL_DEBUG, "Registered command '%s' as %d", g_tempCommand[command_Name], cmdId);
+#endif
+		ExecuteForward(g_fw[onCommandRegistered], g_fw[fwReturn], cmdId, g_tempCommand[command_Name], szPluginName, szFlags, g_tempCommand[command_Desc], g_tempCommand[command_AdminFlags]);
+
+		return cmdId;
+	}
+}
+
+// native ZM_CMD:zm_registerCommandAlias(ZM_CMD:command, const alias[]);
+public ZM_CMD:_registerCommandAlias(pluginId, numParams) {
+	if (numParams != 2) {
+		zm_paramError("zm_registerCommandAlias",2,numParams);
+		return Invalid_Command;
+	}
+	
+	new ZM_CMD:command = ZM_CMD:get_param(1);
+	if (command == Invalid_Command) {
+		log_error(AMX_ERR_NATIVE, "Invalid command handle specified: %d", command);
+		return Invalid_Command;
+	}
+	
+	new szTemp[command_Name_length+1];
+	get_string(2, szTemp, command_Name_length);
+	TrieSetCell(g_handleMap, szTemp, command);
+	return command;
+}
+
+// native zm_getCommandByName(const command[]);
+public ZM_CMD:_getCommandByName(pluginId, numParams) {
+	if (numParams != 1) {
+		zm_paramError("zm_getCommandByName",1,numParams);
+		return Invalid_Command;
+	}
+	
+	new i;
+	new szTemp[command_Name_length+1];
+	get_string(1, szTemp, command_Name_length);
+	if (TrieGetCell(g_handleMap, szTemp, i)) {
+		return ZM_CMD:i;
+	}
+	
+	return Invalid_Command;
 }
