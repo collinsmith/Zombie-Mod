@@ -171,7 +171,6 @@ createZMCfg(szZMConfigsDir[]) {
 	fprintf(file, "; %s\n", ZM_NAME);
 	fprintf(file, "; Version : %s\n", ZM_VERSION_STRING);
 	fprintf(file, "; Author : Tirant\n");
-	// TODO: Write file contents with CVARs and commands list
 	
 	fprintf(file, "\n; Cvars :\n");
 #if defined ZM_DEBUG_MODE
@@ -192,8 +191,13 @@ createZMCfg(szZMConfigsDir[]) {
 }
 
 fprintCvarsFromPlugin(file, forPluginId) {
+	// This function call is O(n^2), however there is no easy alternative, and this only needs to
+	// execute once, or at most, in the rare cases a CFG needs to be generated.
 	new numPluginCvars = get_plugins_cvarsnum();
 	for (new i = 0; i < numPluginCvars; i++) {
+		// Documentation doesn't clarify if these can be reused an zero-indexed correctly, so I am
+		// redeclaring them for each loop. Filing an issue to look into this at some point, as I am
+		// uncomfortable with the amount of memory this consumes as waste, Issue #10
 		new name[32], flags, pluginId, pcvar, description[256];
 		get_plugins_cvar(i, name, 31, flags, pluginId, pcvar, description, 255);
 		if (pluginId != forPluginId) {
