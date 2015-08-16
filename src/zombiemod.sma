@@ -2,7 +2,6 @@
 
 #include <amxmodx>
 #include <amxmisc>
-#include <cvar_util>
 #include <fakemeta>
 #include <regex>
 
@@ -42,6 +41,9 @@ static ZM_LOG_LEVEL:g_logLevel;
 static Array:g_extensionsList = Invalid_Array;
 static g_numExtensions;
 
+new g_pcvar_version;
+new g_pcvar_logLevel;
+
 public plugin_natives() {
 	register_library("zombiemod");
 
@@ -55,22 +57,20 @@ public plugin_natives() {
 public plugin_precache() {
 	register_plugin(ZM_NAME, ZM_VERSION_STRING, "Tirant");
 		
-	new cvarVersion = CvarRegister("zm_version", ZM_VERSION_STRING, "The current version of Zombie Mod being used", FCVAR_SPONLY);
-	CvarLockValue(cvarVersion, ZM_VERSION_STRING);
+	g_pcvar_version = create_cvar("zm_version", ZM_VERSION_STRING, FCVAR_SPONLY, "The current version of Zombie Mod being used");
 	
 	new szDefaultLogLevel[2];
 	num_to_str(any:ZM_LOG_LEVEL_DEBUG, szDefaultLogLevel, 1);
-	new cvarLogLevel = CvarRegister(
+	g_pcvar_logLevel = create_cvar(
 		.name = "zm_logLevel",
 		.string = szDefaultLogLevel,
-		.description = "Log level to use, 0-NONE/1-SEVERE/2-WARN/3-INFO/4-DEBUG",
 		.flags = FCVAR_SPONLY,
-		.hasMin = true,
-		.minValue = 0.0,
-		.hasMax = true,
-		.maxValue = 4.0,
-		.forceInterval = true);
-	CvarCache(cvarLogLevel, CvarType_Int, g_logLevel);
+		.description = "Log level to use, 0-NONE/1-SEVERE/2-WARN/3-INFO/4-DEBUG",
+		.has_min = true,
+		.min_val = 0.0,
+		.has_max = true,
+		.max_val = 4.0);
+	bind_pcvar_num(g_pcvar_logLevel, g_logLevel);
 	
 	configureLogFilePath();
 	
@@ -92,13 +92,22 @@ public plugin_precache() {
 	
 	new szZMConfigsDir[CONFIGS_DIR_PATH_LENGTH+1];
 	szZMConfigsDir = configureZMConfigsDir();
-	createZMCfg(szZMConfigsDir);
-	executeZMCfg(szZMConfigsDir);	
+	
 	configureModName();
 		
 	initializeForwards();
 	
 	log(ZM_LOG_LEVEL_INFO, "=============DONE==============");
+}
+
+public plugin_cfg() {
+#if defined ZM_DEBUG_MODE
+	log(ZM_LOG_LEVEL_DEBUG, "Configuring plugin cfgs");
+#endif
+	new szZMConfigsDir[CONFIGS_DIR_PATH_LENGTH+1];
+	zm_getConfigsDirPath(szZMConfigsDir, CONFIGS_DIR_PATH_LENGTH);
+	createZMCfg(szZMConfigsDir);
+	executeZMCfg(szZMConfigsDir);
 }
 
 configureLogFilePath() {
@@ -107,7 +116,7 @@ configureLogFilePath() {
 	}
 	
 #if defined ZM_DEBUG_MODE
-	log(ZM_LOG_LEVEL_DEBUG, "Configuring zm log file");
+	log(ZM_LOG_LEVEL_DEBUG, "Configuring ZM log file");
 #endif
 
 	new szTime[16];
@@ -163,7 +172,45 @@ createZMCfg(szZMConfigsDir[]) {
 	fprintf(file, "; Version : %s\n", ZM_VERSION_STRING);
 	fprintf(file, "; Author : Tirant\n");
 	// TODO: Write file contents with CVARs and commands list
+	
+	fprintf(file, "\n; Cvars :\n");
+#if defined ZM_DEBUG_MODE
+		log(ZM_LOG_LEVEL_DEBUG, "Reading cvars from '%s'...", ZM_NAME);
+#endif
+	fprintCvarsFromPlugin(file, get_plugin(-1));
+	
+	new extension[extension_t];
+	for (new extId = 0; extId < g_numExtensions; extId++) {
+		ArrayGetArray(g_extensionsList, extId, extension);
+#if defined ZM_DEBUG_MODE
+		log(ZM_LOG_LEVEL_DEBUG, "Reading cvars from '%s'...", extension[ext_Name]);
+#endif
+		fprintCvarsFromPlugin(file, extension[ext_PluginId]);
+	}
+	
 	fclose(file);
+}
+
+fprintCvarsFromPlugin(file, forPluginId) {
+	new numPluginCvars = get_plugins_cvarsnum();
+	for (new i = 0; i < numPluginCvars; i++) {
+		new name[32], flags, pluginId, pcvar, description[256];
+		get_plugins_cvar(i, name, 31, flags, pluginId, pcvar, description, 255);
+		if (pluginId != forPluginId) {
+			continue;
+		}
+		
+		if (pcvar == g_pcvar_version) {
+			continue;
+		}
+		
+		new value[32];
+		get_pcvar_string(pcvar, value, 31);
+#if defined ZM_DEBUG_MODE
+		log(ZM_LOG_LEVEL_DEBUG, "Found %s = \"%s\" ; %s", name, value, description);
+#endif
+		fprintf(file, "%s \"%s\" ; %s\n", name, value, description);
+	}
 }
 
 executeZMCfg(szZMConfigsDir[]) {
@@ -313,6 +360,7 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 	}
 	
 	new extension[extension_t];
+	extension[ext_PluginId] = pluginId;
 	get_string(1, extension[ext_Name], ext_Name_length);
 	get_string(2, extension[ext_Version], ext_Version_length);
 	get_string(3, extension[ext_Desc], ext_Desc_length);
@@ -328,6 +376,7 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 	return extId;
 }
 
+// TODO: deprecate in favor of getExtension(ZM_EXT:extId)
 // native Array:zm_getExtensionsList();
 public Array:_getExtensionsList(pluginId, numParams) {
 	if (numParams != 0) {

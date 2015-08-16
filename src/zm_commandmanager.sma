@@ -4,7 +4,6 @@
 
 #include <amxmodx>
 #include <amxmisc>
-#include <cvar_util>
 
 #include "include\zm\inc\templates\command_t.inc"
 #include "include\zm\inc\zm_colorchat_stocks.inc"
@@ -40,7 +39,7 @@ static g_numHandles;
 static g_tempCommand[command_t];
 
 static Trie:g_prefixMap;
-static g_cvar_prefixes;
+static g_pcvar_prefixes;
 
 static g_szTemp[command_Prefix_length+command_Name_length+1];
 
@@ -69,16 +68,20 @@ public zm_onInit() {
 	
 	initializeForwards();
 	
-	g_cvar_prefixes = CvarRegister("zm_command_prefixes", "/.!", "A list of all symbols that can preceed commands");
-	CvarHookChange(g_cvar_prefixes, "onPrefixesAltered", false);
+	g_pcvar_prefixes = create_cvar("zm_command_prefixes", "/.!", FCVAR_SERVER|FCVAR_SPONLY, "A list of all symbols that can preceed commands");
+	hook_cvar_change(g_pcvar_prefixes, "onPrefixesAltered");
+	
+	new szPrefixes[8];
+	get_pcvar_string(g_pcvar_prefixes, szPrefixes, 7);
+	onPrefixesAltered(g_pcvar_prefixes, "", szPrefixes);
 	
 	register_clcmd("say", "cmdSay");
 	register_clcmd("say_team", "cmdSayTeam");
 }
 
-public onPrefixesAltered(handleCvar, const oldValue[], const newValue[], const cvarName[]) {
+public onPrefixesAltered(pcvar, const oldValue[], const newValue[]) {
 #if defined ZM_DEBUG_MODE
-	assert handleCvar == g_cvar_prefixes;
+	assert pcvar == g_pcvar_prefixes;
 	zm_log(ZM_LOG_LEVEL_DEBUG, "Updating command prefixes table to: %s", newValue);
 #endif
 	TrieClear(g_prefixMap);

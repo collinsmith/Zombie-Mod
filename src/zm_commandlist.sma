@@ -38,7 +38,7 @@ public displayCommandMotD(id) {
 	len += copy(szMotDText[len], 2047, "<STYLE TYPE=\"text/css\"><!--TD{color: \"FFFFFF\"}---></STYLE><table><tr><td>Command:</td><td>&nbsp;&nbsp;Description:</td></tr>");
 	len += copy(szMotDText[len], 2047, g_szCommandTable);
 	len += copy(szMotDText[len], 2047, "</table></blockquote></font></body></html>");
-	show_motd(id, szMotDText, "Zombie Mod Commands: Command List");
+	show_motd(id, szMotDText, "Available Command");
 }
 
 public zm_onCommandRegistered(ZM_CMD:cmdId, const command[], const handle[], const flags[], const description[], const adminFlags) {
