@@ -194,11 +194,13 @@ fprintCvarsFromPlugin(file, forPluginId) {
 	// This function call is O(n^2), however there is no easy alternative, and this only needs to
 	// execute once, or at most, in the rare cases a CFG needs to be generated.
 	new numPluginCvars = get_plugins_cvarsnum();
+	new name[32], flags, pluginId, pcvar, description[256];
 	for (new i = 0; i < numPluginCvars; i++) {
-		// Documentation doesn't clarify if these can be reused an zero-indexed correctly, so I am
-		// redeclaring them for each loop. Filing an issue to look into this at some point, as I am
-		// uncomfortable with the amount of memory this consumes as waste, Issue #10
-		new name[32], flags, pluginId, pcvar, description[256];
+		if (0 < i) {
+			arrayset(name, EOS, 31);
+			arrayset(description, EOS, 255);
+		}
+		
 		get_plugins_cvar(i, name, 31, flags, pluginId, pcvar, description, 255);
 		if (pluginId != forPluginId) {
 			continue;
