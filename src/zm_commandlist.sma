@@ -15,9 +15,6 @@ static g_szCommandList[192];
 public zm_onInit() {
 	zm_registerExtension("[ZM] Command List", PLUGIN_VERSION, "Manages commands that players can use");
 	register_dictionary("zombiemod.txt");
-	
-	refreshCommandMotD();
-	constructCommandTable();
 }
 
 public zm_onRegisterCommands() {
@@ -37,8 +34,10 @@ public displayCommandList(id) {
 public displayCommandMotD(id) {
 	static szMotDText[2048];
 	new len = formatex(szMotDText, 2047, g_szCommandListMotD);
-	len += formatex(szMotDText[len], 2047, g_szCommandTable);
-	len += formatex(szMotDText[len], 2047, "</table></blockquote></font></body></html>");
+	len += formatex(szMotDText[len], 2047, "<br><br>%L:<blockquote>", LANG_SERVER, "COMMANDS");
+	len += copy(szMotDText[len], 2047, "<STYLE TYPE=\"text/css\"><!--TD{color: \"FFFFFF\"}---></STYLE><table><tr><td>Command:</td><td>&nbsp;&nbsp;Description:</td></tr>");
+	len += copy(szMotDText[len], 2047, g_szCommandTable);
+	len += copy(szMotDText[len], 2047, "</table></blockquote></font></body></html>");
 	show_motd(id, szMotDText, "Zombie Mod Commands: Command List");
 }
 
@@ -51,14 +50,13 @@ public zm_onCommandRegistered(ZM_CMD:cmdId, const command[], const handle[], con
 	add(g_szCommandList, 191, tempstring);
 }
 
+public zm_onPrefixesChanged(const oldValue[], const newValue[]) {
+	refreshCommandMotD();
+}
+
 refreshCommandMotD() {
 	new len = formatex(g_szCommandListMotD, 255, "<html><body bgcolor=\"#474642\"><font size=\"3\" face=\"courier new\" color=\"FFFFFF\">");
 	len += formatex(g_szCommandListMotD[len], 255-len, "<center><h1>Zombie Mod Commands v%s</h1>By Tirant</center><br><br>", ZM_VERSION_STRING);
 	len += formatex(g_szCommandListMotD[len], 255-len, "%L: ", LANG_SERVER, "COMMAND_PREFIXES");
 	get_cvar_string("zm_command_prefixes", g_szCommandListMotD[len], 255-len);
-}
-
-constructCommandTable() {
-	formatex(g_szCommandTable, 1791, "<br><br>%L:<blockquote>", LANG_SERVER, "COMMANDS");
-	add(g_szCommandTable, 1791, "<STYLE TYPE=\"text/css\"><!--TD{color: \"FFFFFF\"}---></STYLE><table><tr><td>Command:</td><td>&nbsp;&nbsp;Description:</td></tr>");
 }

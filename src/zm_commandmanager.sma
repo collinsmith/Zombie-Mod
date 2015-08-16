@@ -18,6 +18,7 @@ enum _:FORWARDS_length {
 	onBeforeCommand,
 	onCommand,
 	onCommandRegistered,
+	onPrefixesChanged,
 	onRegisterCommands
 };
 
@@ -66,10 +67,10 @@ public zm_onInit() {
 	zm_registerExtension("[ZM] Command Manager", PLUGIN_VERSION, "Manages commands that players can use");
 	register_dictionary("zombiemod.txt");
 	
+	initializeForwards();
+	
 	g_cvar_prefixes = CvarRegister("zm_command_prefixes", "/.!", "A list of all symbols that can preceed commands");
 	CvarHookChange(g_cvar_prefixes, "onPrefixesAltered", false);
-	
-	initializeForwards();
 	
 	register_clcmd("say", "cmdSay");
 	register_clcmd("say_team", "cmdSayTeam");
@@ -89,6 +90,11 @@ public onPrefixesAltered(handleCvar, const oldValue[], const newValue[], const c
 		TrieSetCell(g_prefixMap, szTemp, i);
 		i++;
 	}
+	
+#if defined ZM_DEBUG_MODE
+	zm_log(ZM_LOG_LEVEL_DEBUG, "zm_onPrefixesChanged");
+#endif
+	ExecuteForward(g_fw[onPrefixesChanged], g_fw[fwReturn], oldValue, newValue);
 }
 
 initializeForwards() {
@@ -99,6 +105,7 @@ initializeForwards() {
 	g_fw[onBeforeCommand] = CreateMultiForward("zm_onBeforeCommand", ET_CONTINUE, FP_CELL, FP_CELL);
 	g_fw[onCommand] = CreateMultiForward("zm_onCommand", ET_IGNORE, FP_CELL, FP_CELL);
 	g_fw[onCommandRegistered] = CreateMultiForward("zm_onCommandRegistered", ET_IGNORE, FP_CELL, FP_STRING, FP_STRING, FP_STRING, FP_STRING, FP_CELL);
+	g_fw[onPrefixesChanged] = CreateMultiForward("zm_onPrefixesChanged", ET_IGNORE, FP_STRING, FP_STRING);
 	
 	fw_registerCommands();
 }
@@ -284,7 +291,7 @@ public ZM_CMD:_registerCommand(pluginId, numParams) {
 		zm_log(ZM_LOG_LEVEL_DEBUG, "Registered command '%s' as %d", g_tempCommand[command_Name], cmdId);
 #endif
 		ExecuteForward(g_fw[onCommandRegistered], g_fw[fwReturn], cmdId, g_tempCommand[command_Name], szPluginName, szFlags, g_tempCommand[command_Desc], g_tempCommand[command_AdminFlags]);
-
+		
 		return cmdId;
 	}
 }

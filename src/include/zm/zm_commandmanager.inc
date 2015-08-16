@@ -54,6 +54,14 @@ forward zm_onCommand(id, ZM_CMD:command);
 forward zm_onCommandRegistered(ZM_CMD:cmdId, const command[], const handle[], const flags[], const description[], const adminFlags);
 
 /**
+ * Called when the set of command prefix symbols has changed.
+ * 
+ * @param oldValue		Old prefix symbols
+ * @param newValue		New prefix symbols
+ */
+forward zm_onPrefixesChanged(const oldValue[], const newValue[]);
+
+/**
  * Called when commands can be registered. This is not strictly enforced, however it is encouraged
  * that commands/aliases be registered during this event.
  */
