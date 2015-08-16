@@ -62,7 +62,7 @@ public plugin_precache() {
 	new szDefaultLogLevel[2];
 	num_to_str(any:ZM_LOG_LEVEL_DEBUG, szDefaultLogLevel, 1);
 	g_pcvar_logLevel = create_cvar(
-		.name = "zm_logLevel",
+		.name = "zm_log_level",
 		.string = szDefaultLogLevel,
 		.flags = FCVAR_SPONLY,
 		.description = "Log level to use, 0-NONE/1-SEVERE/2-WARN/3-INFO/4-DEBUG",
@@ -75,7 +75,7 @@ public plugin_precache() {
 	configureLogFilePath();
 	
 	log(ZM_LOG_LEVEL_INFO, "================================");
-	log(ZM_LOG_LEVEL_INFO, "Launching Zombie Mod v%s...", ZM_VERSION_STRING);
+	log(ZM_LOG_LEVEL_INFO, "Launching Zombie Mod v%s (%s)...", ZM_VERSION_STRING, __DATE__);
 	
 #if defined ZM_DEBUG_MODE
 	log(ZM_LOG_LEVEL_INFO, "Compiled in DEBUG mode");
@@ -169,7 +169,7 @@ createZMCfg(szZMConfigsDir[]) {
 	log(ZM_LOG_LEVEL_INFO, "Could not find '%s'. Creating '%s'...", ZM_CFG_FILE, szFileName);
 	new file = fopen(szFileName, "wt");
 	fprintf(file, "; %s\n", ZM_NAME);
-	fprintf(file, "; Version : %s\n", ZM_VERSION_STRING);
+	fprintf(file, "; Version : %s (%s)\n", ZM_VERSION_STRING, __DATE__);
 	fprintf(file, "; Author : Tirant\n");
 	
 	fprintf(file, "\n; Cvars :\n");
