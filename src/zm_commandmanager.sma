@@ -11,7 +11,7 @@
 #include "include\zm\zombiemod.inc"
 #include "include\zm\zm_teammanger.inc"
 
-#define TEMP_STRING_LENGTH 31
+#define command_Prefix_length 1
 
 enum _:FORWARDS_length {
 	fwReturn = 0,
@@ -41,7 +41,7 @@ static g_tempCommand[command_t];
 static Trie:g_prefixMap;
 static g_cvar_prefixes;
 
-static g_szTempString[TEMP_STRING_LENGTH+1];
+static g_szTemp[command_Prefix_length+command_Name_length+1];
 
 public zm_onInitStructs() {
 	g_handleList = ArrayCreate(command_t, 8);
@@ -104,13 +104,13 @@ fw_registerCommands() {
 }
 
 public cmdSay(id) {
-	read_args(g_szTempString, TEMP_STRING_LENGTH);
-	return checkCommandAndHandled(id, false, g_szTempString);
+	read_args(g_szTemp, command_Prefix_length+command_Name_length);
+	return checkCommandAndHandled(id, false, g_szTemp);
 }
 
 public cmdSayTeam(id) {
-	read_args(g_szTempString, TEMP_STRING_LENGTH);
-	return checkCommandAndHandled(id, true, g_szTempString);
+	read_args(g_szTemp, command_Prefix_length+command_Name_length);
+	return checkCommandAndHandled(id, true, g_szTemp);
 }
 
 /**
@@ -134,9 +134,9 @@ checkCommandAndHandled(id, bool:teamCommand, message[]) {
 	}
 	
 	// This was from the legacy code. I don't think this is neccessary.
-	static szCommand[32];
-	argbreak(message, szCommand, 31, message, 31);
-	if (TrieGetCell(g_handleMap, szCommand[1], i)) {
+	static szCommand[command_Name_length+1];
+	argbreak(message[1], szCommand, command_Name_length, message, command_Prefix_length+command_Name_length);
+	if (TrieGetCell(g_handleMap, szCommand, i)) {
 		return tryExecutingCommand(ZM_CMD:i, id, teamCommand, message);
 	}
 	
