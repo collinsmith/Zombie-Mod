@@ -92,6 +92,7 @@ public plugin_precache() {
 	
 	new szZMConfigsDir[CONFIGS_DIR_PATH_LENGTH+1];
 	szZMConfigsDir = configureZMConfigsDir();
+	createZMCfg(szZMConfigsDir);
 	executeZMCfg(szZMConfigsDir);	
 	configureModName();
 		
@@ -143,6 +144,26 @@ configureZMConfigsDir() {
 	}
 	
 	return szZMConfigsDir;
+}
+
+createZMCfg(szZMConfigsDir[]) {
+#if defined ZM_DEBUG_MODE
+	log(ZM_LOG_LEVEL_DEBUG, "Checking for '%s'...", ZM_CFG_FILE);
+#endif
+
+	new szFileName[64];
+	formatex(szFileName, 63, "%s/%s", szZMConfigsDir, ZM_CFG_FILE);
+	if (file_exists(szFileName)) {
+		return;
+	}
+	
+	log(ZM_LOG_LEVEL_INFO, "Could not find '%s'. Creating '%s'...", ZM_CFG_FILE, szFileName);
+	new file = fopen(szFileName, "wt");
+	fprintf(file, "; %s\n", ZM_NAME);
+	fprintf(file, "; Version : %s\n", ZM_VERSION_STRING);
+	fprintf(file, "; Author : Tirant\n");
+	// TODO: Write file contents with CVARs and commands list
+	fclose(file);
 }
 
 executeZMCfg(szZMConfigsDir[]) {
