@@ -57,7 +57,8 @@ native zm_log(ZM_LOG_LEVEL:level, const message[], any:...);
 /**
  * Registers an extension into ZM with the specified name, description and version. Extensions
  * should be registered in an effort to maintain good "house-keeping" of a server to keep track
- * of plugins which rely on ZM.
+ * of plugins which rely on ZM. Additionally, any CVars that are registered by these extensions
+ * will be automatically added to the CFG file when it is created.
  * 
  * @param name			Name of the extension
  * @param desc			Brief description of the extension
@@ -69,12 +70,12 @@ native zm_log(ZM_LOG_LEVEL:level, const message[], any:...);
 native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");
 
 /**
- * Returns the Array which stores the list of extensions. This native returns a clone of the
- * original Array, which should remain immutable outside of ZM.
+ * Retrieves the metadata stored on a particular extension.
  * 
- * @return				The Array index which stores the extensions list
+ * @param extId			ZM_EXT index of the extension
+ * @param extension		Array of size extension_t to populate with the metadata
  */
-native Array:zm_getExtensionsList();
+native zm_getExtension(ZM_EXT:extId, extension[extension_t]);
 
 /**
  * Returns the number of extensions which have been registered with ZM.

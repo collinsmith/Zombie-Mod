@@ -50,7 +50,7 @@ public plugin_natives() {
 	register_native("zm_log", "_log", 0);
 	
 	register_native("zm_registerExtension", "_registerExtension", 0);
-	register_native("zm_getExtensionsList", "_getExtensionsList", 0);
+	register_native("zm_getExtension", "_getExtension", 0);
 	register_native("zm_getNumExtensions", "_getNumExtensions", 0);
 }
 
@@ -365,30 +365,37 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 	get_string(2, extension[ext_Version], ext_Version_length);
 	get_string(3, extension[ext_Desc], ext_Desc_length);
 	
-	new ZM_EXT:extId = ZM_EXT:ArrayPushArray(g_extensionsList, extension);
+	new ZM_EXT:extId = ZM_EXT:(ArrayPushArray(g_extensionsList, extension)+1);
 	g_numExtensions++;
 	
 #if defined ZM_DEBUG_MODE
-	log(ZM_LOG_LEVEL_DEBUG, "Registered extension: %s", extension[ext_Name]);
+	log(ZM_LOG_LEVEL_DEBUG, "Registered extension '%s' as %d", extension[ext_Name], extId);
 #endif
 
 	ExecuteForward(g_fw[onExtensionRegistered], g_fw[fwReturn], extId, extension[ext_Name], extension[ext_Version], extension[ext_Desc]);
 	return extId;
 }
 
-// TODO: deprecate in favor of getExtension(ZM_EXT:extId)
-// native Array:zm_getExtensionsList();
-public Array:_getExtensionsList(pluginId, numParams) {
-	if (numParams != 0) {
-		zm_paramError("zm_getExtensionsList",0,numParams);
-		return Invalid_Array;
+// native zm_getExtension(ZM_EXT:extId, extension[extension_t]);
+public ZM_RET:_getExtension(pluginId, numParams) {
+	if (numParams != 2) {
+		zm_paramError("zm_getExtension",2,numParams);
+		return ZM_RET_ERROR;
 	}
 	
-	if (g_extensionsList == Invalid_Array) {
-		return Invalid_Array;
+	new ZM_EXT:extId = ZM_EXT:get_param(1);
+	if (extId == Invalid_Extension) {
+		log_error(AMX_ERR_NATIVE, "Cannot retrieve extension data for Invalid_Extension!");
+		return ZM_RET_ERROR;
+	} else if (g_numExtensions < any:extId) {
+		log_error(AMX_ERR_NATIVE, "Cannot retrieve extension data (extId = %d)!", extId);
+		return ZM_RET_ERROR;
 	}
 	
-	return ArrayClone(g_extensionsList);
+	new extension[extension_t];
+	ArrayGetArray(g_extensionsList, any:extId-1, extension);
+	set_array(2, extension, extension_t);
+	return ZM_RET_SUCCESS;
 }
 
 // native zm_getNumExtensions();

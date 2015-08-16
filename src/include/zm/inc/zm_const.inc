@@ -43,9 +43,14 @@ stock const ZM_NAME_SHORT[] = "ZM";
 stock const ZM_VERSION_STRING[] = "1.0.0";
 
 /**
+ * Definition to permit the ZM_RETURN tag in place of the ZM_RET tag.
+ */
+#define ZM_RETURN: ZM_RET:
+
+/**
  * Represents the return values for ZM extensions
  */
-enum ZM_RETURN:ZM_RETURN_length {
+enum ZM_RET:ZM_RETURN_length {
 	/**
 	 * Implies operation should continue
 	 */
