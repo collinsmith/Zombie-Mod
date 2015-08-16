@@ -53,7 +53,7 @@ forward zm_onAfterInfected(id, infector);
  * @param curer			Player index curing, -1 if no player (e.g., another extension)
  * @param blockable		True if returning ZM_RET_BLOCK will block this event, otherwise false
  */
-forward zm_OnBeforeCured(id, curer, bool:blockable);
+forward zm_onBeforeCured(id, curer, bool:blockable);
 
 /**
  * Called when a player is going to be cured. This call cannot be blocked.
