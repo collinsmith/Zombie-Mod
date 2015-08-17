@@ -3,11 +3,9 @@
 #endif
 #define _teammanager_included
 
-#if !defined ZM_DEBUG_MODE
-	#pragma reqlib zm_teammanger
-#endif
+#pragma reqlib zm_teammanager
 
-#include "inc\zm_teammanger_const.inc"
+#include "inc\zm_teammanager_const.inc"
 
 /***************************************************************************************************
 Forwards
@@ -108,9 +106,12 @@ Natives
  * 
  * @param id			Player index to respawn
  * @param force			True to respawn the user, otherwise only respawn the user only if they are
- * 						dead.
+ * 							dead.
+ * 
+ * @return				ZM_RET_ERROR when an error has occurred, otherwise ZM_RET_SUCCESS when the
+ * 							operation was carried out successfully.
  */
-native zm_respawnUser(id, bool:force = false);
+native ZM_RET:zm_respawnUser(id, bool:force = false);
 
 /**
  * Infects a player and attempts to turn them into a zombie.
@@ -118,6 +119,7 @@ native zm_respawnUser(id, bool:force = false);
  * @param id			Player index to infect
  * @param infector		Player index infecting the above player, -1 for no player
  * @param blockable		True to make this native blockable by other extentions, otherwise false
+ * 
  * @return				ZM_CHANGE_INVALID	Implies player is dead or otherwise cannot be changed
  * 						ZM_CHANGED			Implies that the player's state has been changed
  * 						ZM_CANNOT_CHANGE	Implies that the player's state cannot be changed
@@ -130,6 +132,7 @@ native ZM_CHANGE_STATE:zm_infectUser(id, infector = -1, bool:blockable = true);
  * @param id			Player index to cure
  * @param curer			Player index curing the above player, -1 for no player
  * @param blockable		True to make this native blockable by other extentions, otherwise false
+ * 
  * @return				ZM_CHANGE_INVALID	Implies player is dead or otherwise cannot be changed
  * 						ZM_CHANGED			Implies that the player's state has been changed
  * 						ZM_CANNOT_CHANGE	Implies that the player's state cannot be changed
@@ -140,6 +143,7 @@ native ZM_CHANGE_STATE:zm_cureUser(id, curer = -1, bool:blockable = true);
  * Retrieves whether or not a player is currently connected.
  * 
  * @param id			Player index to check
+ * 
  * @return				True if the player is connected, otherwise false
  */
 native bool:zm_isUserConnected(id);
@@ -148,6 +152,7 @@ native bool:zm_isUserConnected(id);
  * Retrieves whether or not a player is currently alive.
  * 
  * @param id			Player index to check
+ * 
  * @return				True if the player is alive, otherwise false
  */
 native bool:zm_isUserAlive(id);
@@ -156,6 +161,7 @@ native bool:zm_isUserAlive(id);
  * Retrieves whether or not a player is currently a zombie.
  * 
  * @param id			Player index to check
+ * 
  * @return				True if the player is a zombie, otherwise false
  */
 native bool:zm_isUserZombie(id);
@@ -164,6 +170,7 @@ native bool:zm_isUserZombie(id);
  * Retrieves whether or not a player is currently a human.
  * 
  * @param id			Player index to check
+ * 
  * @return				True if the player is a human, otherwise false
  */
 native bool:zm_isUserHuman(id);
@@ -173,5 +180,8 @@ native bool:zm_isUserHuman(id);
  * team if it needs to be changed.
  * 
  * @param id			Player index whose infection to fix
+ * 
+ * @return				ZM_RET_ERROR when an error has occurred, otherwise ZM_RET_SUCCESS when the
+ * 							operation was carried out successfully.
  */
-native zm_fixInfection(id);
+native ZM_RET:zm_fixInfection(id);

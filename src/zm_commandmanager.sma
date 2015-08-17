@@ -8,7 +8,7 @@
 #include "include\zm\inc\templates\command_t.inc"
 #include "include\zm\inc\zm_colorchat_stocks.inc"
 #include "include\zm\zombiemod.inc"
-#include "include\zm\zm_teammanger.inc"
+#include "include\zm\zm_teammanager.inc"
 
 #define command_Prefix_length 1
 
@@ -251,8 +251,18 @@ public ZM_CMD:_registerCommand(pluginId, numParams) {
 		return Invalid_Command;
 	}
 	
+	if (g_handleList == Invalid_Array || g_handleNames == Invalid_Array || g_handleMap == Invalid_Trie) {
+		log_error(AMX_ERR_NATIVE, "Cannot register commands yet!");
+		return Invalid_Command;
+	}
+
 	new i;
 	get_string(1, g_tempCommand[command_Name], command_Name_length);
+	if (g_tempCommand[command_Name][0] == EOS) {
+		log_error(AMX_ERR_NATIVE, "Cannot register a command with an empty command/alias!");
+		return Invalid_Command;
+	}
+	
 	strtolower(g_tempCommand[command_Name]);
 	if (TrieGetCell(g_handleMap, g_tempCommand[command_Name], i)) {
 		return Invalid_Command;
@@ -260,6 +270,10 @@ public ZM_CMD:_registerCommand(pluginId, numParams) {
 	
 	new szHandle[32];
 	get_string(2, szHandle, 31);
+	if (szHandle[0] == EOS) {
+		log_error(AMX_ERR_NATIVE, "Cannot register a command with an empty handle!");
+		return Invalid_Command;
+	}
 
 	new Trie:tempTrie;
 	tempTrie = ArrayGetCell(g_handleNames, pluginId);
@@ -281,6 +295,11 @@ public ZM_CMD:_registerCommand(pluginId, numParams) {
 		
 		new szFlags[8];
 		get_string(3, szFlags, 7);
+		if (szFlags[0] == EOS) {
+			log_error(AMX_ERR_NATIVE, "Cannot register a command with empty flags!");
+			return Invalid_Command;
+		}
+		
 		g_tempCommand[command_Flags] = read_flags(szFlags);
 		get_string(4, g_tempCommand[command_Desc], command_Desc_length);
 		g_tempCommand[command_AdminFlags] = get_param(5);
@@ -308,12 +327,19 @@ public ZM_CMD:_registerCommandAlias(pluginId, numParams) {
 	
 	new ZM_CMD:command = ZM_CMD:get_param(1);
 	if (command == Invalid_Command) {
+		log_error(AMX_ERR_NATIVE, "Invalid command handle specified: Invalid_Command", command);
+		return Invalid_Command;
+	} else if (g_numHandles < any:command) {
 		log_error(AMX_ERR_NATIVE, "Invalid command handle specified: %d", command);
 		return Invalid_Command;
 	}
 	
 	new szTemp[command_Name_length+1];
 	get_string(2, szTemp, command_Name_length);
+	if (szTemp[0] == EOS) {
+		return Invalid_Command;
+	}
+	
 	TrieSetCell(g_handleMap, szTemp, command);
 	return command;
 }
@@ -328,6 +354,10 @@ public ZM_CMD:_getCommandByName(pluginId, numParams) {
 	new i;
 	new szTemp[command_Name_length+1];
 	get_string(1, szTemp, command_Name_length);
+	if (szTemp[0] == EOS) {
+		return Invalid_Command;
+	}
+	
 	if (TrieGetCell(g_handleMap, szTemp, i)) {
 		return ZM_CMD:i;
 	}

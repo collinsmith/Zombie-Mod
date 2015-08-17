@@ -26,6 +26,7 @@ static const ZM_LOG_LEVEL_NAMES[ZM_LOG_LEVEL_length][] = {
 enum _:FORWARDS_length {
 	fwReturn,
 	onInitStructs,
+	onPrecache,
 	onInit,
 	onExtensionRegistered
 };
@@ -213,7 +214,7 @@ fprintCvarsFromPlugin(file, forPluginId) {
 		new value[32];
 		get_pcvar_string(pcvar, value, 31);
 #if defined ZM_DEBUG_MODE
-		log(ZM_LOG_LEVEL_DEBUG, "Found %s = \"%s\" ; %s", name, value, description);
+		log(ZM_LOG_LEVEL_DEBUG, "Found %s = \"%s\"", name, value);
 #endif
 		fprintf(file, "%s \"%s\" ; %s\n", name, value, description);
 	}
@@ -253,6 +254,7 @@ configureModName() {
 initializeForwards() {
 	g_fw[onExtensionRegistered] = CreateMultiForward("zm_onExtensionRegistered", ET_IGNORE, FP_CELL, FP_STRING, FP_STRING, FP_STRING);
 	fw_initializeStructs();
+	fw_precache();
 	fw_initialize();
 }
 
@@ -265,6 +267,17 @@ fw_initializeStructs() {
 	ExecuteForward(g_fw[onInitStructs], g_fw[fwReturn]);
 	DestroyForward(g_fw[onInitStructs]);
 	g_fw[onInitStructs] = 0;
+}
+
+fw_precache() {
+#if defined ZM_DEBUG_MODE
+	log(ZM_LOG_LEVEL_DEBUG, "zm_onPrecache");
+#endif
+	
+	g_fw[onPrecache] = CreateMultiForward("zm_onPrecache", ET_IGNORE);
+	ExecuteForward(g_fw[onPrecache], g_fw[fwReturn]);
+	DestroyForward(g_fw[onPrecache]);
+	g_fw[onPrecache] = 0;
 }
 
 fw_initialize() {
@@ -368,6 +381,11 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 	new extension[extension_t];
 	extension[ext_PluginId] = pluginId;
 	get_string(1, extension[ext_Name], ext_Name_length);
+	if (extension[ext_Name][0] == EOS) {
+		log_error(AMX_ERR_NATIVE, "Cannot register an extension with an empty name!");
+		return Invalid_Extension;
+	}
+	
 	get_string(2, extension[ext_Version], ext_Version_length);
 	get_string(3, extension[ext_Desc], ext_Desc_length);
 	
@@ -391,10 +409,10 @@ public ZM_RET:_getExtension(pluginId, numParams) {
 	
 	new ZM_EXT:extId = ZM_EXT:get_param(1);
 	if (extId == Invalid_Extension) {
-		log_error(AMX_ERR_NATIVE, "Cannot retrieve extension data for Invalid_Extension!");
+		log_error(AMX_ERR_NATIVE, "Invalid extension specified: Invalid_Extension");
 		return ZM_RET_ERROR;
 	} else if (g_numExtensions < any:extId) {
-		log_error(AMX_ERR_NATIVE, "Cannot retrieve extension data (extId = %d)!", extId);
+		log_error(AMX_ERR_NATIVE, "Invalid extension specified: %d", extId);
 		return ZM_RET_ERROR;
 	}
 	

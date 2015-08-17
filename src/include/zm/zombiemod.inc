@@ -3,9 +3,7 @@
 #endif
 #define _zombiemod_included
 
-#if !defined ZM_DEBUG_MODE
-	#pragma reqlib zombiemod
-#endif
+#pragma reqlib zombiemod
 
 #include "inc\templates\extension_t.inc"
 #include "inc\zm_const.inc"
@@ -21,6 +19,12 @@ Forwards
  * data structures upon which other extensions may rely.
  */
 forward zm_onInitStructs();
+
+/**
+ * Called after the data structures have been initialized. This forward is intended to be used for
+ * precaching any resources.
+ */
+forward zm_onPrecache();
 
 /**
  * Called after ZM has been initialized. This forward is intended to be used to register plugins

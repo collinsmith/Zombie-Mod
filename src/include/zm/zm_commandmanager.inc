@@ -3,9 +3,9 @@
 #endif
 #define _commandmanager_included
 
-#if !defined ZM_DEBUG_MODE
-	#pragma reqlib zm_commandmanger
-#endif
+#pragma reqlib zm_commandmanger
+
+#include "inc\templates\command_t.inc"
 
 /***************************************************************************************************
 Forwards

@@ -6,7 +6,7 @@
 #include <cs_team_changer>
 #include <hamsandwich>
 
-#include "include\zm\inc\zm_teammanger_const.inc"
+#include "include\zm\inc\zm_teammanager_const.inc"
 #include "include\zm\bitflags.inc"
 #include "include\zm\zombiemod.inc"
 
@@ -365,20 +365,26 @@ public printZombies(id) {
 Natives
 ***************************************************************************************************/
 
-// native zm_respawnUser(id, bool:force = false);
-public _respawnUser(pluginId, numParams) {
+// native ZM_RET:zm_respawnUser(id, bool:force = false);
+public ZM_RET:_respawnUser(pluginId, numParams) {
 	if (numParams != 2) {
 		zm_paramError("zm_respawnUser",2,numParams);
-		return;
+		return ZM_RET_ERROR;
 	}
 	
 	new id = get_param(1);
 	if (!zm_isValidPlayerId(id)) {
 		log_error(AMX_ERR_NATIVE, "Player index out of bounds: %d", id);
-		return;
+		return ZM_RET_ERROR;
+	}
+	
+	if (!isUserConnected(id)) {
+		log_error(AMX_ERR_NATIVE, "User %d is not connected", id);
+		return ZM_RET_ERROR;
 	}
 	
 	respawnUser(get_param(1), bool:get_param(2));
+	return ZM_RET_SUCCESS;
 }
 
 // native ZM_CHANGE_STATE:zm_infectUser(id, infector = -1, bool:blockable = true);
@@ -497,17 +503,17 @@ public bool:_isUserHuman(pluginId, numParams) {
 	return isUserHuman(id);
 }
 
-// native zm_fixInfection(id);
-public bool:_fixInfection(pluginId, numParams) {
+// native ZM_RET:zm_fixInfection(id);
+public ZM_RET:_fixInfection(pluginId, numParams) {
 	if (numParams != 1) {
 		zm_paramError("zm_fixInfection",1,numParams);
-		return;
+		return ZM_RET_ERROR;
 	}
 	
 	new id = get_param(1);
 	new ZM_TEAM:actualTeam = g_actualTeam[id];
 	if (actualTeam == ZM_TEAM_UNASSIGNED || actualTeam == ZM_TEAM_SPECTATOR) {
-		return;
+		return ZM_RET_ERROR;
 	}
 	
 #if defined ZM_DEBUG_MODE
@@ -525,4 +531,6 @@ public bool:_fixInfection(pluginId, numParams) {
 #endif
 		infectUser(id, -1, false);
 	}
+	
+	return ZM_RET_SUCCESS;
 }
