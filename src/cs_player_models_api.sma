@@ -16,13 +16,16 @@
 ================================================================================*/
 
 // Delay between model changes (increase if getting SVC_BAD kicks)
-#define MODELCHANGE_DELAY 0.2
+new Float:g_ModelChangeDelay = 0.2
 
 // Delay after roundstart (increase if getting kicks at round start)
-#define ROUNDSTART_DELAY 2.0
+new Float:g_RoundStartDelay = 2.0
 
 // Enable custom hitboxes (experimental, might lag your server badly with some models)
-//#define SET_MODELINDEX_OFFSET
+new g_SetModelindexOffset = 0
+
+// Uncomment to load settings from zombieplague.ini
+#define LOAD_ZP_SETTINGS
 
 /*=============================================================================*/
 
@@ -39,22 +42,25 @@
 new const DEFAULT_MODELINDEX_T[] = "models/player/terror/terror.mdl"
 new const DEFAULT_MODELINDEX_CT[] = "models/player/urban/urban.mdl"
 
+#if defined LOAD_ZP_SETTINGS
+#include <amx_settings_api>
+new const ZP_SETTINGS_FILE[] = "zombieplague.ini"
+#endif
+
 // CS Player PData Offsets (win32)
 #define PDATA_SAFE 2
 #define OFFSET_CSTEAMS 114
 #define OFFSET_MODELINDEX 491 // Orangutanz
 
 #define flag_get(%1,%2)		(%1 & (1 << (%2 & 31)))
-#define flag_set(%1,%2)		(%1 |= (1 << (%2 & 31)));
-#define flag_unset(%1,%2)	(%1 &= ~(1 << (%2 & 31)));
+#define flag_set(%1,%2)		%1 |= (1 << (%2 & 31))
+#define flag_unset(%1,%2)	%1 &= ~(1 << (%2 & 31))
 
 new g_MaxPlayers
 new g_HasCustomModel
 new Float:g_ModelChangeTargetTime
 new g_CustomPlayerModel[MAXPLAYERS+1][MODELNAME_MAXLENGTH]
-#if defined SET_MODELINDEX_OFFSET
 new g_CustomModelIndex[MAXPLAYERS+1]
-#endif
 
 public plugin_init()
 {
@@ -62,6 +68,15 @@ public plugin_init()
 	register_event("HLTV", "event_round_start", "a", "1=0", "2=0")
 	register_forward(FM_SetClientKeyValue, "fw_SetClientKeyValue")
 	g_MaxPlayers = get_maxplayers()
+	
+#if defined LOAD_ZP_SETTINGS
+	if (!amx_load_setting_float(ZP_SETTINGS_FILE, "SVC_BAD Prevention", "MODELCHANGE DELAY", g_ModelChangeDelay))
+		amx_save_setting_float(ZP_SETTINGS_FILE, "SVC_BAD Prevention", "MODELCHANGE DELAY", g_ModelChangeDelay)
+	if (!amx_load_setting_float(ZP_SETTINGS_FILE, "SVC_BAD Prevention", "ROUNDSTART DELAY", g_RoundStartDelay))
+		amx_save_setting_float(ZP_SETTINGS_FILE, "SVC_BAD Prevention", "ROUNDSTART DELAY", g_RoundStartDelay)
+	if (!amx_load_setting_int(ZP_SETTINGS_FILE, "SVC_BAD Prevention", "SET MODELINDEX OFFSET", g_SetModelindexOffset))
+		amx_save_setting_int(ZP_SETTINGS_FILE, "SVC_BAD Prevention", "SET MODELINDEX OFFSET", g_SetModelindexOffset)
+#endif
 }
 
 public plugin_natives()
@@ -89,11 +104,12 @@ public native_set_player_model(plugin_id, num_params)
 	
 	copy(g_CustomPlayerModel[id], charsmax(g_CustomPlayerModel[]), newmodel)
 	
-#if defined SET_MODELINDEX_OFFSET	
-	new modelpath[32+(2*MODELNAME_MAXLENGTH)]
-	formatex(modelpath, charsmax(modelpath), "models/player/%s/%s.mdl", newmodel, newmodel)
-	g_CustomModelIndex[id] = engfunc(EngFunc_ModelIndex, modelpath)
-#endif
+	if (g_SetModelindexOffset)
+	{
+		new modelpath[32+(2*MODELNAME_MAXLENGTH)]
+		formatex(modelpath, charsmax(modelpath), "models/player/%s/%s.mdl", newmodel, newmodel)
+		g_CustomModelIndex[id] = engfunc(EngFunc_ModelIndex, modelpath)
+	}
 	
 	new currentmodel[MODELNAME_MAXLENGTH]
 	fm_cs_get_user_model(id, currentmodel, charsmax(currentmodel))
@@ -135,7 +151,7 @@ public event_round_start()
 {
 	// An additional delay is offset at round start
 	// since SVC_BAD is more likely to be triggered there
-	g_ModelChangeTargetTime = get_gametime() + ROUNDSTART_DELAY
+	g_ModelChangeTargetTime = get_gametime() + g_RoundStartDelay
 	
 	// If a player has a model change task in progress,
 	// reschedule the task, since it could potentially
@@ -161,9 +177,8 @@ public fw_SetClientKeyValue(id, const infobuffer[], const key[], const value[])
 		if (!equal(currentmodel, g_CustomPlayerModel[id]) && !task_exists(id+TASK_MODELCHANGE))
 			fm_cs_set_user_model(id+TASK_MODELCHANGE)
 		
-#if defined SET_MODELINDEX_OFFSET
-		fm_cs_set_user_model_index(id)
-#endif
+		if (g_SetModelindexOffset)
+			fm_cs_set_user_model_index(id)
 		
 		return FMRES_SUPERCEDE;
 	}
@@ -212,9 +227,8 @@ stock fm_cs_reset_user_model(id)
 	// Set some generic model and let CS automatically reset player model to default
 	copy(g_CustomPlayerModel[id], charsmax(g_CustomPlayerModel[]), "gordon")
 	fm_cs_user_model_update(id+TASK_MODELCHANGE)
-#if defined SET_MODELINDEX_OFFSET
-	fm_cs_reset_user_model_index(id)
-#endif
+	if (g_SetModelindexOffset)
+		fm_cs_reset_user_model_index(id)
 }
 
 stock fm_cs_user_model_update(taskid)
@@ -222,15 +236,15 @@ stock fm_cs_user_model_update(taskid)
 	new Float:current_time
 	current_time = get_gametime()
 	
-	if (current_time - g_ModelChangeTargetTime >= MODELCHANGE_DELAY)
+	if (current_time - g_ModelChangeTargetTime >= g_ModelChangeDelay)
 	{
 		fm_cs_set_user_model(taskid)
 		g_ModelChangeTargetTime = current_time
 	}
 	else
 	{
-		set_task((g_ModelChangeTargetTime + MODELCHANGE_DELAY) - current_time, "fm_cs_set_user_model", taskid)
-		g_ModelChangeTargetTime = g_ModelChangeTargetTime + MODELCHANGE_DELAY
+		set_task((g_ModelChangeTargetTime + g_ModelChangeDelay) - current_time, "fm_cs_set_user_model", taskid)
+		g_ModelChangeTargetTime = g_ModelChangeTargetTime + g_ModelChangeDelay
 	}
 }
 
