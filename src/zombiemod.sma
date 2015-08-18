@@ -348,10 +348,11 @@ public _log(pluginId, numParams) {
 	
 	// I am seeing an issue using this code. In the meantime I am going to just use the code from
 	// the method directly instead of introducing another buffer
-	/*new length = vdformat(g_szLogBuffer, LOG_BUFFER_LENGTH, 2, 3);
-	g_szLogBuffer[length] = EOS;
-	log(ZM_LOG_LEVEL:get_param(1), g_szLogBuffer);*/
-	new ZM_LOG_LEVEL:level = ZM_LOG_LEVEL:get_param(1);
+	static szBuffer[LOG_BUFFER_LENGTH+1];
+	new length = vdformat(szBuffer, LOG_BUFFER_LENGTH, 2, 3);
+	szBuffer[length] = EOS;
+	log(ZM_LOG_LEVEL:get_param(1), szBuffer);
+	/*new ZM_LOG_LEVEL:level = ZM_LOG_LEVEL:get_param(1);
 	if (g_logLevel < level || level <= ZM_LOG_LEVEL_NONE) {
 		return;
 	}
@@ -363,7 +364,7 @@ public _log(pluginId, numParams) {
 	g_szLogBuffer[length++] = ' ';
 	length += vdformat(g_szLogBuffer[length], LOG_BUFFER_LENGTH, 2, 3);
 	g_szLogBuffer[length] = EOS;
-	log_to_file(g_szLogFilePath, g_szLogBuffer);
+	log_to_file(g_szLogFilePath, g_szLogBuffer);*/
 }
 
 // native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");

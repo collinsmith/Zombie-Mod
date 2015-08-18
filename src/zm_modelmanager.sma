@@ -4,7 +4,7 @@
 
 #include <amxmodx>
 #include <amxmisc>
-#include <cs_player_models_api>
+#include <cstrike>
 
 #include "include\zm\inc\templates\model_t.inc"
 #include "include\zm\inc\zm_precache_stocks.inc"
@@ -46,7 +46,7 @@ public zm_onPrecache() {
 }
 
 public zm_onInit() {
-	zm_registerExtension("[ZM] Model Manager", PLUGIN_VERSION, "Manages player model resources and applications");
+	zm_registerExtension("[ZM] Model Manager", PLUGIN_VERSION, "Manages player model resources");
 }
 
 initializeForwards() {
@@ -154,7 +154,7 @@ public ZM_RET:_setModel(pluginId, numParams) {
 	}
 	
 	ArrayGetArray(g_modelList, any:model-1, g_tempModel);
-	cs_set_player_model(id, g_tempModel[model_Name]);
+	cs_set_user_model(id, g_tempModel[model_Name]);
 	return ZM_RET_SUCCESS;
 }
 
@@ -171,6 +171,6 @@ public ZM_RET:_resetModel(pluginId, numParams) {
 		return ZM_RET_ERROR;
 	}
 	
-	cs_reset_player_model(id);
+	cs_reset_user_model(id);
 	return ZM_RET_SUCCESS;
 }
