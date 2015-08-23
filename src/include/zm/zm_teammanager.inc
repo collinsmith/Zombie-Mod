@@ -5,7 +5,7 @@
 
 #pragma reqlib zm_teammanager
 
-#include "inc/zm_teammanager_const.inc"
+#include "include/zm/inc/zm_teammanager_const.inc"
 
 /*******************************************************************************
 Forwards

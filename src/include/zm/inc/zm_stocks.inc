@@ -3,7 +3,7 @@
 #endif
 #define _zm_stocks_included
 
-#include "zm_const.inc"
+#include "include/zm/inc/zm_const.inc"
 
 /*******************************************************************************
 Stocks

@@ -5,7 +5,7 @@
 
 #pragma reqlib zm_modelmanager
 
-#include "inc/templates/model_t.inc"
+#include "include/zm/inc/templates/model_t.inc"
 
 /*******************************************************************************
 Forwards
@@ -25,8 +25,8 @@ Natives
 
 /**
  * Registers and precaches a specified player model into ZM. The player model is
- * asserted to be located at cstrike/models/player/$model/$model.mdl and will
- * throw an error if the model cannot be found.
+ * asserted to be located at cstrike/models/player/${model}/${model}.mdl and
+ * will throw an error if the model cannot be found.
  * 
  * @param model Model to register
  * 

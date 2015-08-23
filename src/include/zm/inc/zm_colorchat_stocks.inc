@@ -5,7 +5,7 @@
 
 #include <colorchat>
 
-#include "zm_const.inc"
+#include "include/zm/inc/zm_const.inc"
 
 /*******************************************************************************
 Stocks

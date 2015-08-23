@@ -4,18 +4,17 @@
 
 #include <amxmodx>
 #include <amxmisc>
-#include <cstrike>
 
 #include "include/zm/inc/templates/model_t.inc"
 #include "include/zm/inc/zm_precache_stocks.inc"
 #include "include/zm/zombiemod.inc"
 #include "include/zm/zm_teammanager.inc"
 
-#define DEFAULT_MODELS_NUM 8
+#define DEFAULT_MODELS_NUM 1
 
 enum _:FORWARDS_length {
     fwReturn = 0,
-    onModelRegistered
+    onHandModelRegistered
 };
 
 static g_fw[FORWARDS_length];
@@ -29,10 +28,10 @@ static g_tempModel[model_t];
 public plugin_natives() {
     register_library("zm_modelmanager");
 
-    register_native("zm_registerModel", "_registerModel", 0);
-    register_native("zm_getModelByName", "_getModelByName", 0);
-    register_native("zm_setModel", "_setModel", 0);
-    register_native("zm_resetModel", "_resetModel", 0);
+    register_native("zm_registerHandModel", "_registerModel", 0);
+    register_native("zm_getHandModelByName", "_getModelByName", 0);
+    register_native("zm_setHandModel", "_setModel", 0);
+    register_native("zm_resetHandModel", "_resetModel", 0);
 }
 
 public zm_onInitStructs() {
@@ -46,23 +45,23 @@ public zm_onPrecache() {
 }
 
 public zm_onInit() {
-    zm_registerExtension("[ZM] Model Manager",
+    zm_registerExtension("[ZM] Hand Model Manager",
                          PLUGIN_VERSION,
-                         "Manages player model resources");
+                         "Manages zombie knife (hand) model resources");
 }
 
 initializeForwards() {
 #if defined ZM_DEBUG_MODE
-    zm_log(ZM_LOG_LEVEL_DEBUG, "Initializing zm_modelmanager forwards");
+    zm_log(ZM_LOG_LEVEL_DEBUG, "Initializing zm_handmodelmanager forwards");
 #endif
 
-    g_fw[onModelRegistered] = CreateMultiForward("zm_onModelRegistered",
-                                                 ET_IGNORE,
-                                                 FP_CELL,
-                                                 FP_ARRAY);
+    g_fw[onHandModelRegistered] = CreateMultiForward("zm_onHandModelRegistered",
+                                                     ET_IGNORE,
+                                                     FP_CELL,
+                                                     FP_ARRAY);
 }
 
-ZM_MDL:getRegisteredModel(model[]) {
+ZM_MDL:getRegisteredHandModel(model[]) {
     strtolower(model);
     new ZM_MDL:mdlId;
     if (TrieGetCell(g_modelTrie, model, mdlId)) {
@@ -76,10 +75,10 @@ ZM_MDL:getRegisteredModel(model[]) {
 Natives
 *******************************************************************************/
 
-// native ZM_MDL:zm_registerModel(const model[]);
-public ZM_MDL:_registerModel(pluginId, numParams) {
+// native ZM_MDL:zm_registerHandModel(const model[]);
+public ZM_MDL:_registerHandModel(pluginId, numParams) {
     if (numParams != 1) {
-        zm_paramError("zm_registerModel",1,numParams);
+        zm_paramError("zm_registerHandModel",1,numParams);
         return Invalid_Model;
     }
     
@@ -94,7 +93,7 @@ public ZM_MDL:_registerModel(pluginId, numParams) {
         return Invalid_Model;
     }
     
-    new ZM_MDL:mdlId = getRegisteredModel(g_tempModel[model_Name]);
+    new ZM_MDL:mdlId = getRegisteredHandModel(g_tempModel[model_Name]);
     if (mdlId != Invalid_Model) {
         return mdlId;
     }
@@ -114,7 +113,7 @@ public ZM_MDL:_registerModel(pluginId, numParams) {
                                g_tempModel[model_Name],
                                mdlId);
 #endif
-    ExecuteForward(g_fw[onModelRegistered],
+    ExecuteForward(g_fw[onHandModelRegistered],
                    g_fw[fwReturn],
                    mdlId,
                    PrepareArray(g_tempModel, model_t));
@@ -122,10 +121,10 @@ public ZM_MDL:_registerModel(pluginId, numParams) {
     return mdlId;
 }
 
-// native ZM_MDL:zm_getModelByName(const model[]);
-public ZM_MDL:_getModelByName(pluginId, numParams) {
+// native ZM_MDL:zm_getHandModelByName(const model[]);
+public ZM_MDL:_getHandModelByName(pluginId, numParams) {
     if (numParams != 1) {
-        zm_paramError("zm_getModelByName",1,numParams);
+        zm_paramError("zm_getHandModelByName",1,numParams);
         return Invalid_Model;
     }
     
@@ -139,13 +138,13 @@ public ZM_MDL:_getModelByName(pluginId, numParams) {
         return Invalid_Model;
     }
     
-    return getRegisteredModel(model);
+    return getRegisteredHandModel(model);
 }
 
-// native ZM_RET:zm_setModel(id, ZM_MDL:model);
-public ZM_RET:_setModel(pluginId, numParams) {
+// native ZM_RET:zm_setHandModel(id, ZM_MDL:model);
+public ZM_RET:_setHandModel(pluginId, numParams) {
     if (numParams != 2) {
-        zm_paramError("zm_setModel",2,numParams);
+        zm_paramError("zm_setHandModel",2,numParams);
         return ZM_RET_ERROR;
     }
     
@@ -165,14 +164,14 @@ public ZM_RET:_setModel(pluginId, numParams) {
     }
     
     ArrayGetArray(g_modelList, any:model-1, g_tempModel);
-    cs_set_user_model(id, g_tempModel[model_Name]);
+    //cs_set_user_model(id, g_tempModel[model_Name]);
     return ZM_RET_SUCCESS;
 }
 
-// native ZM_RET:zm_resetModel(id);
-public ZM_RET:_resetModel(pluginId, numParams) {
+// native ZM_RET:zm_resetHandModel(id);
+public ZM_RET:_resetHandModel(pluginId, numParams) {
     if (numParams != 1) {
-        zm_paramError("zm_resetModel",1,numParams);
+        zm_paramError("zm_resetHandModel",1,numParams);
         return ZM_RET_ERROR;
     }
     
@@ -182,6 +181,6 @@ public ZM_RET:_resetModel(pluginId, numParams) {
         return ZM_RET_ERROR;
     }
     
-    cs_reset_user_model(id);
+    //cs_reset_user_model(id);
     return ZM_RET_SUCCESS;
 }
