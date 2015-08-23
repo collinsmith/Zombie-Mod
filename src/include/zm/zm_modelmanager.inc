@@ -5,7 +5,7 @@
 
 #pragma reqlib zm_modelmanager
 
-#include "inc\\templates\\model_t.inc"
+#include "inc/templates/model_t.inc"
 
 /*******************************************************************************
 Forwards

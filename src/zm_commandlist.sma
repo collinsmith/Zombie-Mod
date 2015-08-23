@@ -1,12 +1,12 @@
 #define PLUGIN_VERSION "0.0.1"
 
-#include "include\\zm\\compiler_settings.inc"
+#include "include/zm/compiler_settings.inc"
 
 #include <amxmodx>
 
-#include "include\\zm\\inc\\zm_colorchat_stocks.inc"
-#include "include\\zm\\zombiemod.inc"
-#include "include\\zm\\zm_commandmanager.inc"
+#include "include/zm/inc/zm_colorchat_stocks.inc"
+#include "include/zm/zombiemod.inc"
+#include "include/zm/zm_commandmanager.inc"
 
 static g_szCommandListMotD[256];
 static g_szCommandTable[1792];

@@ -1,14 +1,14 @@
-#include "include\\zm\\compiler_settings.inc"
+#include "include/zm/compiler_settings.inc"
 
 #include <amxmodx>
 #include <amxmisc>
 #include <fakemeta>
 #include <regex>
 
-#include "include\\zm\\inc\\templates\\extension_t.inc"
-#include "include\\zm\\inc\\zm_const.inc"
-#include "include\\zm\\inc\\zm_stocks.inc"
-#include "include\\zm\\inc\\zm_macros.inc"
+#include "include/zm/inc/templates/extension_t.inc"
+#include "include/zm/inc/zm_const.inc"
+#include "include/zm/inc/zm_stocks.inc"
+#include "include/zm/inc/zm_macros.inc"
 
 #define DEFAULT_EXTENSIONS_NUM 16
 
