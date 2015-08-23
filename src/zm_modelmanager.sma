@@ -11,6 +11,8 @@
 #include "include\\zm\\zombiemod.inc"
 #include "include\\zm\\zm_teammanager.inc"
 
+#define DEFAULT_MODELS_NUM 8
+
 #define command_Prefix_length 1
 
 enum _:FORWARDS_length {
@@ -36,7 +38,7 @@ public plugin_natives() {
 }
 
 public zm_onInitStructs() {
-	g_modelList = ArrayCreate(model_t, 8);
+	g_modelList = ArrayCreate(model_t, DEFAULT_MODELS_NUM);
 	g_modelTrie = TrieCreate();
 	
 	initializeForwards();

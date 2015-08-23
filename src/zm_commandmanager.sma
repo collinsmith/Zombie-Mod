@@ -10,6 +10,8 @@
 #include "include\\zm\\zombiemod.inc"
 #include "include\\zm\\zm_teammanager.inc"
 
+#define DEFAULT_COMMANDS_NUM 16
+
 #define command_Prefix_length 1
 
 enum _:FORWARDS_length {
@@ -52,7 +54,7 @@ public plugin_natives() {
 }
 
 public zm_onInitStructs() {
-	g_handleList = ArrayCreate(command_t, 8);
+	g_handleList = ArrayCreate(command_t, DEFAULT_COMMANDS_NUM);
 	g_handleNames = ArrayCreate(1);
 	for (new i = 0; i < get_pluginsnum(); i++) {
 		ArrayPushCell(g_handleNames, TrieCreate());
