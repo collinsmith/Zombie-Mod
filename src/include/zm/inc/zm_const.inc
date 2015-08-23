@@ -1,11 +1,11 @@
 #if defined _zm_const_included
-	#endinput
+    #endinput
 #endif
 #define _zm_const_included
 
-/******************************************************************************************************************************
+/*******************************************************************************
 Data/Definitions
-******************************************************************************************************************************/
+*******************************************************************************/
 
 /**
  * Defines the current version of ZM
@@ -38,7 +38,8 @@ stock const ZM_NAME[] = "Zombie Mod";
 stock const ZM_NAME_SHORT[] = "ZM";
 
 /**
- * String representation of the version of ZM. This should match the value of the definition.
+ * String representation of the version of ZM. This should match the value of
+ * the definition.
  */
 stock const ZM_VERSION_STRING[] = "1.0.0";
 
@@ -51,55 +52,57 @@ stock const ZM_VERSION_STRING[] = "1.0.0";
  * Represents the return values for ZM extensions
  */
 enum ZM_RET:ZM_RETURN_length {
-	/**
-	 * Implies operation should continue
-	 */
-	ZM_RET_CONTINUE = 1000,
-	
-	/**
-	 * Implies operation should be blocked
-	 */
-	ZM_RET_BLOCK,
-	
-	/**
-	 * Implies that the operation was a success
-	 */
-	ZM_RET_SUCCESS,
-	
-	/**
-	 * Implies there was some kind of error
-	 */
-	ZM_RET_ERROR
+    /**
+     * Implies operation should continue
+     */
+    ZM_RET_CONTINUE = 1000,
+    
+    /**
+     * Implies operation should be blocked
+     */
+    ZM_RET_BLOCK,
+    
+    /**
+     * Implies that the operation was a success
+     */
+    ZM_RET_SUCCESS,
+    
+    /**
+     * Implies there was some kind of error
+     */
+    ZM_RET_ERROR
 };
 
 /**
  * Represents the various log levels used when logging messages.
  */
 enum ZM_LOG_LEVEL:ZM_LOG_LEVEL_length {
-	/**
-	 * Represents the level where no messages are logged. This is not a valid value for logging
-	 * messages.
-	 */
-	ZM_LOG_LEVEL_NONE = 0,
-	
-	/**
-	 * Represents the level where severe messages are logged and the plugin cannot recover.
-	 */
-	ZM_LOG_LEVEL_SEVERE,
-	
-	/**
-	 * Represents the level where warning messages are logged. These messages should be addressed.
-	 */
-	ZM_LOG_LEVEL_WARN,
-	
-	/**
-	 * Represents the level where informational messages are logged.
-	 */
-	ZM_LOG_LEVEL_INFO,
-	
-	/**
-	 * Represents the level where debugging messages are logged. This should not be enabled unless
-	 * debugging.
-	 */
-	ZM_LOG_LEVEL_DEBUG
+    /**
+     * Represents the level where no messages are logged. This is not a valid
+     * value for logging messages.
+     */
+    ZM_LOG_LEVEL_NONE = 0,
+    
+    /**
+     * Represents the level where severe messages are logged and the plugin
+     * cannot recover.
+     */
+    ZM_LOG_LEVEL_SEVERE,
+    
+    /**
+     * Represents the level where warning messages are logged. These messages
+     * should be addressed.
+     */
+    ZM_LOG_LEVEL_WARN,
+    
+    /**
+     * Represents the level where informational messages are logged.
+     */
+    ZM_LOG_LEVEL_INFO,
+    
+    /**
+     * Represents the level where debugging messages are logged. This should not
+     * be enabled unless debugging.
+     */
+    ZM_LOG_LEVEL_DEBUG
 };

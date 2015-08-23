@@ -1,5 +1,5 @@
 #if defined _model_t_included
-	#endinput
+    #endinput
 #endif
 #define _model_t_included
 
@@ -17,15 +17,15 @@
  * Constant representing the value used for a model which is invalid.
  */
 enum ZM_MDL {
-	Invalid_Model
+    Invalid_Model
 };
 
 /**
  * Represents a template for a ZM model.
  */
 enum model_t {
-	/**
-	 * Name of this model
-	 */
-	model_Name[model_Name_length+1],
+    /**
+     * Name of this model
+     */
+    model_Name[model_Name_length+1],
 };
