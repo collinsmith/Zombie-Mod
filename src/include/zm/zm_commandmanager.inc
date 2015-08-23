@@ -5,7 +5,7 @@
 
 #pragma reqlib zm_commandmanger
 
-#include "inc\templates\command_t.inc"
+#include "inc\\templates\\command_t.inc"
 
 /***************************************************************************************************
 Forwards

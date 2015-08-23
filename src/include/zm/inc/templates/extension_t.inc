@@ -26,7 +26,9 @@
 /**
  * Constant representing the value used for an extension which is invalid.
  */
-stock const ZM_EXT:Invalid_Extension = ZM_EXT:0;
+enum ZM_EXT {
+	Invalid_Extension
+};
 
 /**
  * Represents a template for a ZM extension plugin's metadata.

@@ -21,7 +21,9 @@
 /**
  * Constant representing the value used for a command which is invalid.
  */
-stock const ZM_CMD:Invalid_Command = ZM_CMD:0;
+enum ZM_CMD {
+	Invalid_Command
+};
 
 /**
  * Represents a template for a ZM command.
@@ -56,10 +58,4 @@ enum command_t {
 	 * Admin flags needed
 	 */
 	command_AdminFlags,
-	
-	/**
-	 * Length of the command
-	 */
-	command_NameLen
-#pragma deprecated command_NameLen
 };

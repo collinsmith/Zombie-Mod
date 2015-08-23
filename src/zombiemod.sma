@@ -1,14 +1,16 @@
-#include "include\zm\compiler_settings.inc"
+#include "include\\zm\\compiler_settings.inc"
 
 #include <amxmodx>
 #include <amxmisc>
 #include <fakemeta>
 #include <regex>
 
-#include "include\zm\inc\templates\extension_t.inc"
-#include "include\zm\inc\zm_const.inc"
-#include "include\zm\inc\zm_stocks.inc"
-#include "include\zm\inc\zm_macros.inc"
+#include "include\\zm\\inc\\templates\\extension_t.inc"
+#include "include\\zm\\inc\\zm_const.inc"
+#include "include\\zm\\inc\\zm_stocks.inc"
+#include "include\\zm\\inc\\zm_macros.inc"
+
+#define DEFAULT_EXTENSIONS_NUM 16
 
 #define LOG_BUFFER_LENGTH 255
 #define LOG_PATH_LENGTH 63
@@ -42,8 +44,8 @@ static ZM_LOG_LEVEL:g_logLevel;
 static Array:g_extensionsList = Invalid_Array;
 static g_numExtensions;
 
-new g_pcvar_version;
-new g_pcvar_logLevel;
+static g_pcvar_version;
+static g_pcvar_logLevel;
 
 public plugin_natives() {
 	register_library("zombiemod");
@@ -61,7 +63,7 @@ public plugin_precache() {
 	g_pcvar_version = create_cvar("zm_version", ZM_VERSION_STRING, FCVAR_SPONLY, "The current version of Zombie Mod being used");
 	
 	new szDefaultLogLevel[2];
-	num_to_str(any:ZM_LOG_LEVEL_DEBUG, szDefaultLogLevel, 1);
+	num_to_str(any:ZM_LOG_LEVEL_DEBUG, szDefaultLogLevel, charsmax(szDefaultLogLevel));
 	g_pcvar_logLevel = create_cvar(
 		.name = "zm_log_level",
 		.string = szDefaultLogLevel,
@@ -82,7 +84,7 @@ public plugin_precache() {
 	log(ZM_LOG_LEVEL_INFO, "Compiled in DEBUG mode");
 #endif
 	
-	g_extensionsList = ArrayCreate(extension_t, 16);
+	g_extensionsList = ArrayCreate(extension_t, DEFAULT_EXTENSIONS_NUM);
 	g_numExtensions = 0;
 	
 	register_concmd("zm.version", "printVersion", _, "Prints the version info");
@@ -121,7 +123,7 @@ configureLogFilePath() {
 #endif
 
 	new szTime[16];
-	get_time("%Y-%m-%d", szTime, 15);
+	get_time("%Y-%m-%d", szTime, charsmax(szTime));
 	formatex(g_szLogFilePath, LOG_PATH_LENGTH, "zombiemod_%s.log", szTime);
 }
 
@@ -140,7 +142,7 @@ configureZMConfigsDir() {
 	switch (mkdir(szZMConfigsDir)) {
 		case -1: {
 			new szErrorMessage[64];
-			formatex(szErrorMessage, 63, "Failed to create ZM configs directory!");
+			formatex(szErrorMessage, charsmax(szErrorMessage), "Failed to create ZM configs directory!");
 			log(ZM_LOG_LEVEL_SEVERE, szErrorMessage);
 			set_fail_state(szErrorMessage);
 		}
@@ -162,7 +164,7 @@ createZMCfg(szZMConfigsDir[]) {
 #endif
 
 	new szFileName[64];
-	formatex(szFileName, 63, "%s/%s", szZMConfigsDir, ZM_CFG_FILE);
+	formatex(szFileName, charsmax(szFileName), "%s/%s", szZMConfigsDir, ZM_CFG_FILE);
 	if (file_exists(szFileName)) {
 		return;
 	}
@@ -198,11 +200,11 @@ fprintCvarsFromPlugin(file, forPluginId) {
 	new name[32], flags, pluginId, pcvar, description[256];
 	for (new i = 0; i < numPluginCvars; i++) {
 		if (0 < i) {
-			arrayset(name, EOS, 31);
-			arrayset(description, EOS, 255);
+			arrayset(name, EOS, charsmax(name));
+			arrayset(description, EOS, charsmax(description));
 		}
 		
-		get_plugins_cvar(i, name, 31, flags, pluginId, pcvar, description, 255);
+		get_plugins_cvar(i, name, charsmax(name), flags, pluginId, pcvar, description, charsmax(description));
 		if (pluginId != forPluginId) {
 			continue;
 		}
@@ -212,7 +214,7 @@ fprintCvarsFromPlugin(file, forPluginId) {
 		}
 		
 		new value[32];
-		get_pcvar_string(pcvar, value, 31);
+		get_pcvar_string(pcvar, value, charsmax(value));
 #if defined ZM_DEBUG_MODE
 		log(ZM_LOG_LEVEL_DEBUG, "Found %s = \"%s\"", name, value);
 #endif
@@ -327,7 +329,7 @@ public printExtensions(id) {
 	for (new i = 0; i < g_numExtensions; i++) {
 		ArrayGetArray(g_extensionsList, i, extension);
 		new szStatus[16];
-		get_plugin(extension[ext_PluginId], _, _, _, _, _, _, _, _, szStatus, 15);
+		get_plugin(extension[ext_PluginId], _, _, _, _, _, _, _, _, szStatus, charsmax(szStatus));
 		console_print(id, "%d. %s %s [%s]", i+1, extension[ext_Name], extension[ext_Version], szStatus);
 	}
 	

@@ -1,15 +1,15 @@
 #define PLUGIN_VERSION "0.0.1"
 
-#include "include\zm\compiler_settings.inc"
+#include "include\\zm\\compiler_settings.inc"
 
 #include <amxmodx>
 #include <amxmisc>
 #include <cstrike>
 
-#include "include\zm\inc\templates\model_t.inc"
-#include "include\zm\inc\zm_precache_stocks.inc"
-#include "include\zm\zombiemod.inc"
-#include "include\zm\zm_teammanager.inc"
+#include "include\\zm\\inc\\templates\\model_t.inc"
+#include "include\\zm\\inc\\zm_precache_stocks.inc"
+#include "include\\zm\\zombiemod.inc"
+#include "include\\zm\\zm_teammanager.inc"
 
 #define command_Prefix_length 1
 

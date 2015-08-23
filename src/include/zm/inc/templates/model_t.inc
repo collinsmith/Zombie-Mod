@@ -16,7 +16,9 @@
 /**
  * Constant representing the value used for a model which is invalid.
  */
-stock const ZM_MDL:Invalid_Model = ZM_MDL:0;
+enum ZM_MDL {
+	Invalid_Model
+};
 
 /**
  * Represents a template for a ZM model.

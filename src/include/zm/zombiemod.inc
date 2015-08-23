@@ -5,10 +5,10 @@
 
 #pragma reqlib zombiemod
 
-#include "inc\templates\extension_t.inc"
-#include "inc\zm_const.inc"
-#include "inc\zm_stocks.inc"
-#include "inc\zm_macros.inc"
+#include "inc\\templates\\extension_t.inc"
+#include "inc\\zm_const.inc"
+#include "inc\\zm_stocks.inc"
+#include "inc\\zm_macros.inc"
 
 /***************************************************************************************************
 Forwards

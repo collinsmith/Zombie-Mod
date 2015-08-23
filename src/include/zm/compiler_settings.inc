@@ -4,7 +4,7 @@
 #define _compiler_settings_included
 
 #pragma semicolon 1
-#pragma ctrlchar '\'
+#pragma ctrlchar 0x5C
 
 /**
  * Enables whether or not to compile in debug mode. Compiling in debug mode will enable many
