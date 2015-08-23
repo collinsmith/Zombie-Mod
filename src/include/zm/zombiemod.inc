@@ -44,15 +44,18 @@ forward zm_onInit();
  * @param desc      Brief description of the extension
  * @param version   Version string for the extension        
  */
-forward zm_onExtensionRegistered(ZM_EXT:extension, const name[], const version[], const description[]);
+forward zm_onExtensionRegistered(ZM_EXT:extension,
+                                 const name[],
+                                 const version[],
+                                 const description[]);
 
-/***************************************************************************************************
+/*******************************************************************************
 Natives
-***************************************************************************************************/
+*******************************************************************************/
 
 /**
- * Logs a message with the specified log level into the ZM log file if that log level is within the
- * scope of the server log level.
+ * Logs a message with the specified log level into the ZM log file if that log
+ * level is within the scope of the server log level.
  * 
  * @param level         Log level of the message
  * @param messageFmt    The message to log
@@ -78,7 +81,9 @@ native zm_log(ZM_LOG_LEVEL:level, const message[], any:...);
  * @error           Throws an error if extensions cannot be registered at the
  *                      time of calling
  */
-native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");
+native ZM_EXT:zm_registerExtension(const name[],
+                                   const version[] = "",
+                                   const description[] = "");
 
 /**
  * Retrieves the metadata stored on a particular extension.
