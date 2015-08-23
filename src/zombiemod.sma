@@ -60,10 +60,16 @@ public plugin_natives() {
 public plugin_precache() {
 	register_plugin(ZM_NAME, ZM_VERSION_STRING, "Tirant");
 		
-	g_pcvar_version = create_cvar("zm_version", ZM_VERSION_STRING, FCVAR_SPONLY, "The current version of Zombie Mod being used");
+	g_pcvar_version = create_cvar("zm_version",
+								  ZM_VERSION_STRING,
+								  FCVAR_SPONLY,
+								  "The current version of Zombie Mod being used");
 	
 	new szDefaultLogLevel[2];
-	num_to_str(any:ZM_LOG_LEVEL_DEBUG, szDefaultLogLevel, charsmax(szDefaultLogLevel));
+	num_to_str(any:ZM_LOG_LEVEL_DEBUG,
+			   szDefaultLogLevel,
+			   charsmax(szDefaultLogLevel));
+
 	g_pcvar_logLevel = create_cvar(
 		.name = "zm_log_level",
 		.string = szDefaultLogLevel,
@@ -73,12 +79,15 @@ public plugin_precache() {
 		.min_val = 0.0,
 		.has_max = true,
 		.max_val = 4.0);
+
 	bind_pcvar_num(g_pcvar_logLevel, g_logLevel);
 	
 	configureLogFilePath();
 	
 	log(ZM_LOG_LEVEL_INFO, "================================");
-	log(ZM_LOG_LEVEL_INFO, "Launching Zombie Mod v%s (%s)...", ZM_VERSION_STRING, __DATE__);
+	log(ZM_LOG_LEVEL_INFO, "Launching Zombie Mod v%s (%s)...",
+						   ZM_VERSION_STRING,
+						   __DATE__);
 	
 #if defined ZM_DEBUG_MODE
 	log(ZM_LOG_LEVEL_INFO, "Compiled in DEBUG mode");
@@ -90,7 +99,10 @@ public plugin_precache() {
 	register_concmd("zm.version", "printVersion", _, "Prints the version info");
 	
 #if defined ZM_DEBUG_MODE
-	register_concmd("zm.exts", "printExtensions", ADMIN_CFG, "Prints the list of registered extensions");
+	register_concmd("zm.exts",
+					"printExtensions",
+					ADMIN_CFG,
+					"Prints the list of registered extensions");
 #endif
 	
 	new szZMConfigsDir[CONFIGS_DIR_PATH_LENGTH+1];
@@ -138,11 +150,14 @@ configureZMConfigsDir() {
 		return szZMConfigsDir;
 	}
 	
-	log(ZM_LOG_LEVEL_INFO, "Creating ZM configs directory at '%s'...", szZMConfigsDir);
+	log(ZM_LOG_LEVEL_INFO, "Creating ZM configs directory at '%s'...",
+						   szZMConfigsDir);
 	switch (mkdir(szZMConfigsDir)) {
 		case -1: {
 			new szErrorMessage[64];
-			formatex(szErrorMessage, charsmax(szErrorMessage), "Failed to create ZM configs directory!");
+			formatex(szErrorMessage,
+					 charsmax(szErrorMessage),
+					 "Failed to create ZM configs directory!");
 			log(ZM_LOG_LEVEL_SEVERE, szErrorMessage);
 			set_fail_state(szErrorMessage);
 		}
@@ -164,12 +179,16 @@ createZMCfg(szZMConfigsDir[]) {
 #endif
 
 	new szFileName[64];
-	formatex(szFileName, charsmax(szFileName), "%s/%s", szZMConfigsDir, ZM_CFG_FILE);
+	formatex(szFileName, charsmax(szFileName), "%s/%s",
+											   szZMConfigsDir,
+											   ZM_CFG_FILE);
 	if (file_exists(szFileName)) {
 		return;
 	}
 	
-	log(ZM_LOG_LEVEL_INFO, "Could not find '%s'. Creating '%s'...", ZM_CFG_FILE, szFileName);
+	log(ZM_LOG_LEVEL_INFO, "Could not find '%s'. Creating '%s'...",
+						   ZM_CFG_FILE,
+						   szFileName);
 	new file = fopen(szFileName, "wt");
 	fprintf(file, "; %s\n", ZM_NAME);
 	fprintf(file, "; Version : %s (%s)\n", ZM_VERSION_STRING, __DATE__);
@@ -194,8 +213,9 @@ createZMCfg(szZMConfigsDir[]) {
 }
 
 fprintCvarsFromPlugin(file, forPluginId) {
-	// This function call is O(n^2), however there is no easy alternative, and this only needs to
-	// execute once, or at most, in the rare cases a CFG needs to be generated.
+	// This function call is O(n^2), however there is no easy alternative, and
+	// this only needs to execute once, or at most, in the rare cases a CFG
+	// needs to be generated.
 	new numPluginCvars = get_plugins_cvarsnum();
 	new name[32], flags, pluginId, pcvar, description[256];
 	for (new i = 0; i < numPluginCvars; i++) {
@@ -204,7 +224,14 @@ fprintCvarsFromPlugin(file, forPluginId) {
 			arrayset(description, EOS, charsmax(description));
 		}
 		
-		get_plugins_cvar(i, name, charsmax(name), flags, pluginId, pcvar, description, charsmax(description));
+		get_plugins_cvar(i,
+						 name,
+						 charsmax(name),
+						 flags,
+						 pluginId,
+						 pcvar,
+						 description,
+						 charsmax(description));
 		if (pluginId != forPluginId) {
 			continue;
 		}
@@ -254,7 +281,12 @@ configureModName() {
 }
 
 initializeForwards() {
-	g_fw[onExtensionRegistered] = CreateMultiForward("zm_onExtensionRegistered", ET_IGNORE, FP_CELL, FP_STRING, FP_STRING, FP_STRING);
+	g_fw[onExtensionRegistered] = CreateMultiForward("zm_onExtensionRegistered",
+													 ET_IGNORE,
+													 FP_CELL,
+													 FP_STRING,
+													 FP_STRING,
+													 FP_STRING);
 	fw_initializeStructs();
 	fw_precache();
 	fw_initialize();
@@ -300,7 +332,9 @@ log(ZM_LOG_LEVEL:level, string[], any:...) {
 
 	new length = 0;
 	g_szLogBuffer[length++] = '[';
-	length += copy(g_szLogBuffer[length], LOG_BUFFER_LENGTH-length, ZM_LOG_LEVEL_NAMES[any:level]);
+	length += copy(g_szLogBuffer[length],
+				   LOG_BUFFER_LENGTH-length,
+				   ZM_LOG_LEVEL_NAMES[any:level]);
 	g_szLogBuffer[length++] = ']';
 	g_szLogBuffer[length++] = ' ';
 	length += vformat(g_szLogBuffer[length], LOG_BUFFER_LENGTH-length, string, 3);
@@ -313,9 +347,9 @@ public fw_getGameDescription() {
 	return FMRES_SUPERCEDE;
 }
 
-/***************************************************************************************************
+/*******************************************************************************
 Console Commands
-***************************************************************************************************/
+*******************************************************************************/
 
 public printVersion(id) {
 	console_print(id, "Zombie Mod v%s", ZM_VERSION_STRING);
@@ -329,17 +363,31 @@ public printExtensions(id) {
 	for (new i = 0; i < g_numExtensions; i++) {
 		ArrayGetArray(g_extensionsList, i, extension);
 		new szStatus[16];
-		get_plugin(extension[ext_PluginId], _, _, _, _, _, _, _, _, szStatus, charsmax(szStatus));
-		console_print(id, "%d. %s %s [%s]", i+1, extension[ext_Name], extension[ext_Version], szStatus);
+		get_plugin(extension[ext_PluginId],
+				   _,
+				   _,
+				   _,
+				   _,
+				   _,
+				   _,
+				   _,
+				   _,
+				   szStatus,
+				   charsmax(szStatus));
+		console_print(id, "%d. %s %s [%s]",
+						  i+1,
+						  extension[ext_Name],
+						  extension[ext_Version],
+						  szStatus);
 	}
 	
 	console_print(id, "%d plugins loaded", g_numExtensions);
 }
 #endif
 
-/***************************************************************************************************
+/*******************************************************************************
 Natives
-***************************************************************************************************/
+*******************************************************************************/
 
 // native zm_log(ZM_LOG_LEVEL:level, const messageFmt[], any:...);
 public _log(pluginId, numParams) {
@@ -348,25 +396,10 @@ public _log(pluginId, numParams) {
 		return;
 	}
 	
-	// I am seeing an issue using this code. In the meantime I am going to just use the code from
-	// the method directly instead of introducing another buffer
 	static szBuffer[LOG_BUFFER_LENGTH+1];
 	new length = vdformat(szBuffer, LOG_BUFFER_LENGTH, 2, 3);
 	szBuffer[length] = EOS;
 	log(ZM_LOG_LEVEL:get_param(1), szBuffer);
-	/*new ZM_LOG_LEVEL:level = ZM_LOG_LEVEL:get_param(1);
-	if (g_logLevel < level || level <= ZM_LOG_LEVEL_NONE) {
-		return;
-	}
-
-	new length = 0;
-	g_szLogBuffer[length++] = '[';
-	length += copy(g_szLogBuffer[length], LOG_BUFFER_LENGTH-length, ZM_LOG_LEVEL_NAMES[any:level]);
-	g_szLogBuffer[length++] = ']';
-	g_szLogBuffer[length++] = ' ';
-	length += vdformat(g_szLogBuffer[length], LOG_BUFFER_LENGTH, 2, 3);
-	g_szLogBuffer[length] = EOS;
-	log_to_file(g_szLogFilePath, g_szLogBuffer);*/
 }
 
 // native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");
@@ -396,10 +429,17 @@ public ZM_EXT:_registerExtension(pluginId, numParams) {
 	g_numExtensions++;
 	
 #if defined ZM_DEBUG_MODE
-	log(ZM_LOG_LEVEL_DEBUG, "Registered extension '%s' as %d", extension[ext_Name], extId);
+	log(ZM_LOG_LEVEL_DEBUG, "Registered extension '%s' as %d",
+							extension[ext_Name],
+							extId);
 #endif
 
-	ExecuteForward(g_fw[onExtensionRegistered], g_fw[fwReturn], extId, extension[ext_Name], extension[ext_Version], extension[ext_Desc]);
+	ExecuteForward(g_fw[onExtensionRegistered],
+				   g_fw[fwReturn],
+				   extId,
+				   extension[ext_Name],
+				   extension[ext_Version],
+				   extension[ext_Desc]);
 	return extId;
 }
 
