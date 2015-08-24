@@ -3,7 +3,7 @@
 #endif
 #define _commandmanager_included
 
-#pragma reqlib zm_commandmanger
+#pragma reqlib zm_commandmanager
 
 #include "include/zm/inc/templates/command_t.inc"
 
@@ -119,7 +119,7 @@ Natives
 native ZM_CMD:zm_registerCommand(const command[],
                                  const handle[],
                                  const flags[] = "abcdef",
-                                 const description[] = "",
+                                 const description[] = NULL_STRING,
                                  const adminFlags = ADMIN_ALL);
 
 /**

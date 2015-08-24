@@ -276,7 +276,7 @@ tryExecutingCommand(ZM_CMD:command, id, bool:teamCommand, message[]) {
 Natives
 *******************************************************************************/
 
-// native ZM_CMD:zm_registerCommand(const command[], const handle[], const flags[] = "abcdef", const description[] = "", const adminFlags = ADMIN_ALL);
+// native ZM_CMD:zm_registerCommand(const command[], const handle[], const flags[] = "abcdef", const description[] = NULL_STRING, const adminFlags = ADMIN_ALL);
 public ZM_CMD:_registerCommand(pluginId, numParams) {
     if (numParams != 5) {
         zm_paramError("zm_registerCommand",5,numParams);

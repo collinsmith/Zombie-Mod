@@ -49,6 +49,13 @@ public zm_onInit() {
     zm_registerExtension("[ZM] Model Manager",
                          PLUGIN_VERSION,
                          "Manages player model resources");
+
+#if defined ZM_DEBUG_MODE
+    register_concmd("zm.playerModels",
+                    "printModels",
+                    ADMIN_CFG,
+                    "Prints the list of registered player models");
+#endif
 }
 
 initializeForwards() {
@@ -71,6 +78,26 @@ ZM_MDL:getRegisteredModel(model[]) {
     
     return Invalid_Model;
 }
+
+/*******************************************************************************
+Console Commands
+*******************************************************************************/
+
+#if defined ZM_DEBUG_MODE
+public printModels(id) {
+    console_print(id, "Outputting player models list...");
+    
+    for (new i = 0; i < g_numModels; i++) {
+        ArrayGetArray(g_modelList, i, g_tempModel);
+        console_print(id, "%d. %s [%s]",
+                          i+1,
+                          g_tempModel[model_Name],
+                          g_tempModel[model_Path]);
+    }
+    
+    console_print(id, "%d models registered", g_numModels);
+}
+#endif
 
 /*******************************************************************************
 Natives
@@ -99,9 +126,12 @@ public ZM_MDL:_registerModel(pluginId, numParams) {
         return mdlId;
     }
     
-    if (!zm_precachePlayerModel(g_tempModel[model_Name])) {
+    zm_formatPlayerModelPath(g_tempModel[model_Name],
+                             g_tempModel[model_Path],
+                             model_Path_length);
+    if (!zm_precache(g_tempModel[model_Path])) {
         log_error(AMX_ERR_NATIVE, "Failed to precache model: %s",
-                                  g_tempModel[model_Name]);
+                                  g_tempModel[model_Path]);
         return Invalid_Model;
     }
     

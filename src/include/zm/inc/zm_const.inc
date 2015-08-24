@@ -70,7 +70,7 @@ enum ZM_RET:ZM_RETURN_length {
     /**
      * Implies there was some kind of error
      */
-    ZM_RET_ERROR
+    ZM_RET_ERROR,
 };
 
 /**
@@ -104,5 +104,5 @@ enum ZM_LOG_LEVEL:ZM_LOG_LEVEL_length {
      * Represents the level where debugging messages are logged. This should not
      * be enabled unless debugging.
      */
-    ZM_LOG_LEVEL_DEBUG
+    ZM_LOG_LEVEL_DEBUG,
 };

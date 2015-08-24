@@ -59,7 +59,7 @@ public plugin_natives() {
 
 public plugin_precache() {
     register_plugin(ZM_NAME, ZM_VERSION_STRING, "Tirant");
-        
+    
     g_pcvar_version = create_cvar("zm_version",
                                   ZM_VERSION_STRING,
                                   FCVAR_SPONLY,
@@ -402,7 +402,7 @@ public _log(pluginId, numParams) {
     log(ZM_LOG_LEVEL:get_param(1), szBuffer);
 }
 
-// native ZM_EXT:zm_registerExtension(const name[], const version[] = "", const description[] = "");
+// native ZM_EXT:zm_registerExtension(const name[], const version[] = NULL_STRING, const description[] = NULL_STRING);
 public ZM_EXT:_registerExtension(pluginId, numParams) {
     if (numParams != 3) {
         zm_paramError("zm_registerExtension",3,numParams);

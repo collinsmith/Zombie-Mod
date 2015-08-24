@@ -82,8 +82,8 @@ native zm_log(ZM_LOG_LEVEL:level, const message[], any:...);
  *                      time of calling
  */
 native ZM_EXT:zm_registerExtension(const name[],
-                                   const version[] = "",
-                                   const description[] = "");
+                                   const version[] = NULL_STRING,
+                                   const description[] = NULL_STRING);
 
 /**
  * Retrieves the metadata stored on a particular extension.

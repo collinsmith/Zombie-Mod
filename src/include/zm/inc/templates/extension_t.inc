@@ -52,5 +52,5 @@ enum extension_t {
     /**
      * String representation for the version of this extension.
      */
-    ext_Version[ext_Version_length+1]
+    ext_Version[ext_Version_length+1],
 };

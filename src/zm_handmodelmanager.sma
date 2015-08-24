@@ -28,10 +28,10 @@ static g_tempModel[model_t];
 public plugin_natives() {
     register_library("zm_modelmanager");
 
-    register_native("zm_registerHandModel", "_registerModel", 0);
-    register_native("zm_getHandModelByName", "_getModelByName", 0);
-    register_native("zm_setHandModel", "_setModel", 0);
-    register_native("zm_resetHandModel", "_resetModel", 0);
+    register_native("zm_registerHandModel", "_registerHandModel", 0);
+    register_native("zm_getHandModelByName", "_getHandModelByName", 0);
+    register_native("zm_setHandModel", "_setHandModel", 0);
+    register_native("zm_resetHandModel", "_resetHandModel", 0);
 }
 
 public zm_onInitStructs() {
@@ -48,6 +48,13 @@ public zm_onInit() {
     zm_registerExtension("[ZM] Hand Model Manager",
                          PLUGIN_VERSION,
                          "Manages zombie knife (hand) model resources");
+
+#if defined ZM_DEBUG_MODE
+    register_concmd("zm.handModels",
+                    "printModels",
+                    ADMIN_CFG,
+                    "Prints the list of registered hand models");
+#endif
 }
 
 initializeForwards() {
@@ -70,6 +77,26 @@ ZM_MDL:getRegisteredHandModel(model[]) {
     
     return Invalid_Model;
 }
+
+/*******************************************************************************
+Console Commands
+*******************************************************************************/
+
+#if defined ZM_DEBUG_MODE
+public printModels(id) {
+    console_print(id, "Outputting hand models list...");
+    
+    for (new i = 0; i < g_numModels; i++) {
+        ArrayGetArray(g_modelList, i, g_tempModel);
+        console_print(id, "%d. %s [%s]",
+                          i+1,
+                          g_tempModel[model_Name],
+                          g_tempModel[model_Path]);
+    }
+    
+    console_print(id, "%d models registered", g_numModels);
+}
+#endif
 
 /*******************************************************************************
 Natives
@@ -98,9 +125,12 @@ public ZM_MDL:_registerHandModel(pluginId, numParams) {
         return mdlId;
     }
     
-    if (!zm_precachePlayerModel(g_tempModel[model_Name])) {
+    zm_formatModelPath(g_tempModel[model_Name],
+                       g_tempModel[model_Path],
+                       model_Path_length);
+    if (!zm_precacheModel(g_tempModel[model_Path])) {
         log_error(AMX_ERR_NATIVE, "Failed to precache model: %s",
-                                  g_tempModel[model_Name]);
+                                  g_tempModel[model_Path]);
         return Invalid_Model;
     }
     
