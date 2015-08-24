@@ -44,14 +44,14 @@ stock const ZM_NAME_SHORT[] = "ZM";
 stock const ZM_VERSION_STRING[] = "1.0.0";
 
 /**
- * Definition to permit the ZM_RETURN tag in place of the ZM_RET tag.
+ * Definition to permit the ZM_RET tag in place of the ZM_RETURN tag.
  */
-#define ZM_RETURN: ZM_RET:
+#define ZM_RET: ZM_RETURN:
 
 /**
  * Represents the return values for ZM extensions
  */
-enum ZM_RET:ZM_RETURN_length {
+enum ZM_RETURN:ZM_RETURN_length {
     /**
      * Implies operation should continue
      */
@@ -72,6 +72,11 @@ enum ZM_RET:ZM_RETURN_length {
      */
     ZM_RET_ERROR,
 };
+
+/**
+ * Definition to permit the ZM_LOG tag in place of the ZM_LOG_LEVEL tag.
+ */
+#define ZM_LOG: ZM_LOG_LEVEL:
 
 /**
  * Represents the various log levels used when logging messages.
