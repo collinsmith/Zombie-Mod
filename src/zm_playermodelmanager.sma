@@ -49,7 +49,7 @@ public zm_onInit() {
                          "Manages player model resources");
 
 #if defined ZM_DEBUG_MODE
-    register_concmd("zm.models.player",
+    register_concmd("zm.models.players",
                     "printModels",
                     ADMIN_CFG,
                     "Prints the list of registered player models");
@@ -106,7 +106,7 @@ public printModels(id) {
 
 // native ZM_PLAYER_MODEL:zm_registerPlayerModel(const name[]);
 public ZM_PLAYER_MODEL:_registerPlayerModel(pluginId, numParams) {
-    if (numParams != 2) {
+    if (numParams != 1) {
         zm_paramError("zm_registerPlayerModel",1,numParams);
         return Invalid_Player_Model;
     }
