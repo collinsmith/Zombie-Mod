@@ -3,13 +3,13 @@
 #endif
 #define _zm_colorchat_stocks_included
 
-#include <colorchat>
+#include <amxmodx>
 
 #include "include/zm/inc/zm_const.inc"
 
 /*******************************************************************************
-Stocks
-*******************************************************************************/
+ * Stocks
+ ******************************************************************************/
 
 /**
  * Defines the length of the buffer used for printing.
@@ -41,5 +41,5 @@ stock zm_printColor(id, message[], any:...) {
     }
     
     buffer[length] = EOS;
-    client_print_color(id, DontChange, buffer);
+    client_print_color(id, print_team_default, buffer);
 }

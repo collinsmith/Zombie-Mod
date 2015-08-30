@@ -1,70 +1,99 @@
-#if defined _modelmanager_included
+#if defined _zm_modelmanager_included
     #endinput
 #endif
-#define _modelmanager_included
+#define _zm_modelmanager_included
 
 #pragma reqlib zm_modelmanager
 
 #include "include/zm/inc/templates/model_t.inc"
 
 /*******************************************************************************
-Forwards
-*******************************************************************************/
+ * FORWARDS
+ ******************************************************************************/
 
 /**
- * Called when a model is registered into ZM.
+ * Called when a model is registered. This forward cannot be blocked.
  * 
- * @param mdlId Model index of the model
- * @param model Array of size model_t to populate with model info
+ * @param mdl   Unique identifier created for the model
+ * @param model Array of size model_t containing the data representing the model
  */
-forward zm_onModelRegistered(ZM_MDL:mdlId, model[model_t]);
+forward zm_onModelRegistered(ZM_MODEL:mdl, model[model_t]);
 
 /*******************************************************************************
-Natives
-*******************************************************************************/
+ * NATIVES
+ ******************************************************************************/
 
 /**
- * Registers and precaches a specified player model into ZM. The player model is
- * asserted to be located at cstrike/models/player/${model}/${model}.mdl and
- * will throw an error if the model cannot be found.
+ * Registers a model into the model manager and returns the unique identifier
+ * for that model. Model names must me unique, i.e., each name must correspond
+ * with a single path, and registering a second model using the name of an
+ * already registered model will result in this native returning the identifier
+ * for the registered model. Models should be registered on
+ * {@link #zombiemod.zm_onPrecache()}.
  * 
- * @param model Model to register
+ * @example     new ZM_MODEL:model = zm_registerModel("example",
+ *                                                    "models/example.mdl");
  * 
- * @return      Model index created for the model, otherwise Invalid_Model if an
- *                  error occurred
+ * @param name  Name of the model
+ * @param path  Path to the model
  * 
- * @error       If the model cannot be found, or there was an error loading it.
+ * @return      Unique identifier created for this model or for the model which
+ *              is already registered by this name, otherwise {@code Invalid_Model}
+ *              if an error occurred when registering.
+ * 
+ * @error       An error will be thrown if an empty name or path is specified,
+ *              or if there was a problem precaching the model at the path e.g.,
+ *              when the model does not exist. Errors can also be thrown when
+ *              the underlying data structures for managing the models have not
+ *              yet been initialized.
  */
-native ZM_MDL:zm_registerModel(const model[]);
+native ZM_MODEL:zm_registerModel(const name[], const path[]);
 
 /**
- * Retrieves the model index for the model by the given name.
+ * Performs a lookup on a particular model name and returns the unique identifier
+ * for that model.
  * 
- * @param model Model to search for
+ * @example     new ZM_MODEL:model = zm_getModelByName("example");
+ * @example     if (zm_getModelByName("example") != Invalid_Model) { ... }
  * 
- * @return      Model index of the model, otherwise Invalid_Model if the
- *                  model is not registered
+ * @param name  Name of the model to look up
+ * 
+ * @return      Unique identifier for the model under the given name, otherwise
+ *              {@code Invalid_Model} if none was found.
+ * 
+ * @see #zm_isModelRegistered(%1)
  */
-native ZM_MDL:zm_getModelByName(const model[]);
+native ZM_MODEL:zm_getModelByName(const name[]);
 
 /**
- * Applies the specified model index on a given player. Model indexes are
- * created when a model is registered using zm_registerModel, and can be looked
- * up if not cached using zm_getModelByName.
+ * Copies the data representing the specified model into the specified array of
+ * size model_t.
  * 
- * @param id    Player index to apply model on
- * @param model Model to apply
+ * @example     new copy[model_t];
+ *              zm_getModel(model, copy);
  * 
- * @error       If the model or player index is invalid
+ * @param model Unique identifier of the model
+ * @param copy  Array of size model_t to copy the model's data into
+ * 
+ * @return      {@code ZM_RET_SUCCESS} if the operation was carried out successfully,
+ *              otherwise {@code ZM_RET_ERROR}
+ * 
+ * @error       If an invalid model is specified (typically {@code Invalid_Model}).
  */
-native ZM_RET:zm_setModel(id, ZM_MDL:model);
+native ZM_RETURN:zm_getModel(ZM_MODEL:model, copy[model_t]);
+
+/*******************************************************************************
+ * MACROS
+ ******************************************************************************/
 
 /**
- * Resets the model for a specified player (i.e., changes to their default
- * model).
+ * Returns whether or not a model has been registered under a specified name.
  * 
- * @param id    Player index to apply model on
+ * @param %1    Name of the model
  * 
- * @error       If the player index is invalid
+ * @return      {@literal true} if it is, otherwise {@literal false}
+ * 
+ * @see #zm_getModelByName(name[])
  */
-native ZM_RET:zm_resetModel(id);
+#define zm_isModelRegistered(%1)\
+    (zm_getModelByName(%1) != Invalid_Model)

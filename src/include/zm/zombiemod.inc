@@ -11,8 +11,8 @@
 #include "include/zm/inc/zm_macros.inc"
 
 /*******************************************************************************
-Forwards
-*******************************************************************************/
+ * Forwards
+ ******************************************************************************/
 
 /**
  * Called before the initialization of ZM. This forward is intended to be used
@@ -50,8 +50,8 @@ forward zm_onExtensionRegistered(ZM_EXT:extension,
                                  const description[]);
 
 /*******************************************************************************
-Natives
-*******************************************************************************/
+ * Natives
+ ******************************************************************************/
 
 /**
  * Logs a message with the specified log level into the ZM log file if that log

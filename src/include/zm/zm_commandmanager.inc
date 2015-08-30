@@ -8,8 +8,8 @@
 #include "include/zm/inc/templates/command_t.inc"
 
 /*******************************************************************************
-Forwards
-*******************************************************************************/
+ * Forwards
+ ******************************************************************************/
 
 /**
  * Called before a command is processed. Returning ZM_RET_BLOCK will prevent the
@@ -79,8 +79,8 @@ forward zm_onPrefixesChanged(const oldValue[], const newValue[]);
 forward zm_onRegisterCommands();
 
 /*******************************************************************************
-Natives
-*******************************************************************************/
+ * Natives
+ ******************************************************************************/
 
 /**
  * Registers a command into the ZM command manager.  Commands are designed to

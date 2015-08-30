@@ -4,9 +4,9 @@
 #define _model_t_included
 
 /**
- * Definition to permit the ZM_MODEL tag in place of the ZM_MDL tag.
+ * Definition to permit the ZM_MDL tag in place of the ZM_MODEL tag.
  */
-#define ZM_MODEL: ZM_MDL:
+#define ZM_MDL: ZM_MODEL:
 
 /**
  * Defines the maximum length for the name field of a model
@@ -21,7 +21,7 @@
 /**
  * Constant representing the value used for a model which is invalid.
  */
-enum ZM_MDL {
+enum ZM_MODEL {
     Invalid_Model
 };
 
