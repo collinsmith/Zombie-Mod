@@ -10,7 +10,7 @@
 #include "include/zm/inc/zm_stocks.inc"
 #include "include/zm/inc/zm_macros.inc"
 
-#define DEFAULT_EXTENSIONS_NUM 16
+#define INITIAL_EXTENSIONS_SIZE 16
 
 #define LOG_BUFFER_LENGTH 255
 #define LOG_PATH_LENGTH 63
@@ -93,7 +93,7 @@ public plugin_precache() {
     log(ZM_LOG_LEVEL_INFO, "Compiled in DEBUG mode");
 #endif
     
-    g_extensionsList = ArrayCreate(extension_t, DEFAULT_EXTENSIONS_NUM);
+    g_extensionsList = ArrayCreate(extension_t, INITIAL_EXTENSIONS_SIZE);
     g_numExtensions = 0;
     
     register_concmd("zm.version", "printVersion", _, "Prints the version info");
