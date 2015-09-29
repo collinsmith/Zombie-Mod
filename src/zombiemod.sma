@@ -19,17 +19,17 @@ static g_pCvar_Version;
 static Array:g_extensionsList = Invalid_Array;
 static g_numExtensions;
 
-enum any:Forwards {
+enum Forwards {
     fwReturn,
     onPrecache,
     onInit,
     onExtensionInit,
     onExtensionRegistered
-}; static g_fw[Forwards] = { INVALID_HANDLE, ... };
+}; static g_fw[Forwards] = { 0, INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE };
 
 public plugin_natives() {
     register_library("zombiemod");
-    
+
     register_native("zm_registerExtension", "_registerExtension", 0);
     register_native("zm_getExtension", "_getExtension", 0);
     register_native("zm_getNumExtensions", "_getNumExtensions", 0);
@@ -141,7 +141,7 @@ public printExtensions(id) {
                     .status = status,
                     .len5 = charsmax(status));
             console_print(id,
-                    "%d. %8.8s %8.8s %8.8s]",
+                    "%d. %8.8s %8.8s %8.8s",
                     i+1,
                     extension[ext_Name],
                     extension[ext_Version],
@@ -156,7 +156,10 @@ public printExtensions(id) {
  * Natives
  ******************************************************************************/
 
-// native ZM_Extension: zm_registerExtension(const name[], const version[] = NULL_STRING, const description[] = NULL_STRING);
+// native ZM_Extension: zm_registerExtension(
+//         const name[] = NULL_STRING,
+//         const version[] = NULL_STRING,
+//         const description[] = NULL_STRING);
 public ZM_Extension: _registerExtension(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 3, numParams)) {
         return Invalid_Extension;
@@ -180,9 +183,8 @@ public ZM_Extension: _registerExtension(pluginId, numParams) {
                 .len1 = ext_Name_length);
         extension[ext_Name][strlen(extension[ext_Name])-5] = EOS;
         LoggerLogDebug(g_Logger,
-                "Cannot register an extension with an empty name, using \"%s\"",
+                "Empty extension name specified, using \"%s\"",
                 extension[ext_Name]);
-        return Invalid_Extension;
     }
     
     get_string(2, extension[ext_Version], ext_Version_length);
@@ -193,9 +195,8 @@ public ZM_Extension: _registerExtension(pluginId, numParams) {
     g_numExtensions++;
     
     LoggerLogDebug(g_Logger,
-            "Registered extension \"%s\" v%s as %d",
+            "Registered extension \"%s\" as ZM_Extension: %d",
             extension[ext_Name],
-            extension[ext_Version],
             extId);
 
     if (g_fw[onExtensionRegistered] == INVALID_HANDLE) {
@@ -207,6 +208,9 @@ public ZM_Extension: _registerExtension(pluginId, numParams) {
                 FP_STRING,
                 FP_STRING,
                 FP_STRING);
+        LoggerLogDebug(g_Logger,
+                "g_fw[onExtensionRegistered] = %d",
+                g_fw[onExtensionRegistered]);
     }
 
     LoggerLogDebug(g_Logger, "Calling zm_onExtensionRegistered");
