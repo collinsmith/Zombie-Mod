@@ -36,15 +36,19 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-    register_plugin("Zombie Mod", ZM_VERSION_STRING, "Tirant");
+    register_plugin(ZM_MOD_NAME, ZM_VERSION_STRING, "Tirant");
 
     new buildId[32];
     zm_getBuildId(buildId);
+    new desc[256];
+    formatex(desc, charsmax(desc),
+            "The current version of %s being used",
+            ZM_MOD_NAME);
     g_pCvar_Version = create_cvar(
             "zm_version",
             buildId,
             FCVAR_SPONLY,
-            "The current version of Zombie Mod being used");
+            desc);
 
     g_Logger = LoggerCreate();
 #if defined ZM_COMPILE_FOR_DEBUG
@@ -52,7 +56,7 @@ public plugin_precache() {
     LoggerSetVerbosity(All_Loggers, Severity_Lowest);
 #endif
     
-    LoggerLogInfo(g_Logger, "Launching Zombie Mod v%s...", buildId);
+    LoggerLogInfo(g_Logger, "Launching %s v%s...", ZM_MOD_NAME, buildId);
 
     new dictionary[32];
     zm_getDictonaryPath(dictionary);
