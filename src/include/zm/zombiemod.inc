@@ -3,6 +3,8 @@
 #endif
 #define _zombiemod_included
 
+#pragma reqlib zombiemod
+
 #include "include\\zm\\zm_cfg.inc"
 #include "include\\zm\\zm_lang.inc"
 #include "include\\zm\\zm_version.inc"
