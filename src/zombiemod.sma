@@ -1,4 +1,5 @@
 #define INITIAL_EXTENSIONS_SIZE 8
+#define USE_PLUGIN_NAME_FOR_EXTENSION_NAME
 
 #include <amxmodx>
 #include <logger>
@@ -190,11 +191,18 @@ public ZM_Extension: _registerExtension(pluginId, numParams) {
     extension[ext_PluginId] = pluginId;
     get_string(1, extension[ext_Name], ext_Name_length);
     if (extension[ext_Name][0] == EOS) {
+#if defined USE_PLUGIN_NAME_FOR_EXTENSION_NAME
+        get_plugin(
+                .index = pluginId,
+                .name = extension[ext_Name],
+                .len2 = ext_Name_length);
+#else
         get_plugin(
                 .index = pluginId,
                 .filename = extension[ext_Name],
                 .len1 = ext_Name_length);
         extension[ext_Name][strlen(extension[ext_Name])-5] = EOS;
+#endif
         LoggerLogDebug(g_Logger,
                 "Empty extension name specified, using \"%s\"",
                 extension[ext_Name]);
