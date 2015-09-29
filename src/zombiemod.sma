@@ -36,7 +36,7 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-    register_plugin(ZM_NAME, ZM_VERSION_STRING, "Tirant");
+    register_plugin("Zombie Mod", ZM_VERSION_STRING, "Tirant");
 
     new buildId[32];
     zm_getBuildId(buildId);
