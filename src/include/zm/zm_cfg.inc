@@ -7,6 +7,12 @@
 #include "include\\stocks\\path_stocks.inc"
 
 /**
+ * Defines the name of ZM. This value is used in places before the lang is
+ * registered. Typically, only {@link zm_cfg::#ZM_NAME} need be used.
+ */
+#define ZM_MOD_NAME "Zombie Mod"
+
+/**
  * Defines the path of the ZM configs folder through amxmodx/configs/
  */
 #define ZM_CONFIGS_DIR "zm"
