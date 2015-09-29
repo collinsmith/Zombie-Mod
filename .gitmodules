@@ -1,0 +1,9 @@
+[submodule "Stocks"]
+	path = Stocks
+	url = https://github.com/collinsmith/Stocks.git
+[submodule "src/Stocks"]
+	path = src/Stocks
+	url = https://github.com/collinsmith/Stocks.git
+[submodule "src/include/stocks"]
+	path = src/include/stocks
+	url = https://github.com/collinsmith/stocks.git

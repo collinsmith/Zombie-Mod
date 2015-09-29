@@ -1,0 +1,38 @@
+#if defined _zm_version_included
+    #endinput
+#endif
+#define _zm_version_included
+
+/**
+ * Enables whether or not to compile in debug mode. Compiling in debug mode will
+ * enable many additional commands and features that are not required for
+ * standard use.
+ */
+#define ZM_COMPILE_FOR_DEBUG
+
+/**
+ * Defines the current version of ZM represented as an integer.
+ */
+#define ZM_VERSION 1
+
+/**
+ * String representation of the version of ZM.
+ */
+stock const ZM_VERSION_STRING[] = "1.0.0";
+
+/**
+ * Populated a given array with the string representation for the build id for
+ * the current build of ZM.
+ * 
+ * @param buildId String to populate
+ * @param len     Maximum number of bytes to copy (will copy up to len-1)
+ * 
+ * @return number of bytes copied
+ */
+stock zm_getBuildId(buildId[], len = sizeof buildId) {
+#if defined ZM_COMPILE_FOR_DEBUG
+    return formatex(buildId, len - 1, "%s [%s] [DEBUG]", ZM_VERSION_STRING, __DATE__);
+#else
+    return formatex(buildId, len - 1, "%s [%s]", ZM_VERSION_STRING, __DATE__);
+#endif
+}
