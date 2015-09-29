@@ -88,6 +88,8 @@ public plugin_precache() {
     zm_onPrecache();
     zm_onInit();
     zm_onExtensionInit();
+    
+    executeZMCfg();
 }
 
 zm_onPrecache() {
@@ -107,11 +109,18 @@ zm_onInit() {
 }
 
 zm_onExtensionInit() {
-    LoggerLogDebug(g_Logger, "Calling ");
+    LoggerLogDebug(g_Logger, "Calling zm_onExtensionInit");
     g_fw[onExtensionInit] = CreateMultiForward("zm_onExtensionInit", ET_IGNORE);
     ExecuteForward(g_fw[onExtensionInit], g_fw[fwReturn]);
     DestroyForward(g_fw[onExtensionInit]);
     g_fw[onExtensionInit] = INVALID_HANDLE;
+}
+
+executeZMCfg() {
+    new configFile[256];
+    zm_getConfigsFilePath(configFile);
+    LoggerLogDebug(g_Logger, "Executing %s", configFile);
+    server_cmd("exec %s", configFile);
 }
 
 /*******************************************************************************
