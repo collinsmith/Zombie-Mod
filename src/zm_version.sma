@@ -1,3 +1,4 @@
+#define VERSION_STRING "1.0.0"
 #define MOD_NAME_LENGTH 31
 
 #include <logger>
@@ -10,6 +11,7 @@ static Logger: g_Logger = Invalid_Logger;
 static g_ModName[MOD_NAME_LENGTH+1];
 
 public zm_onExtensionInit() {
+    register_plugin("[ZM] Version", VERSION_STRING, "Tirant");
     zm_registerExtension();
 
     g_Logger = LoggerCreate();
