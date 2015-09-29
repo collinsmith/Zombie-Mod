@@ -16,6 +16,15 @@
  */
 #define ZM_CFG_FILE "zombiemod.cfg"
 
+/**
+ * Copies the ZM configs directory into the specified array.
+ * 
+ * @param dst Destination array to copy into
+ * @param len Maximum number of bytes to copy (will zero-terminate
+ *                {@code len-1})
+ * 
+ * @return number of bytes copied
+ */
 stock zm_getConfigsDirPath(dst[], len = sizeof dst) {
     new tempLen = get_localinfo("amxx_configsdir", dst, len);
     tempLen += formatex(dst[tempLen], len-tempLen-1, "%c", PATH_SEPARATOR);
@@ -24,6 +33,15 @@ stock zm_getConfigsDirPath(dst[], len = sizeof dst) {
     return tempLen;
 }
 
+/**
+ * Copies the ZM configs file path into the specified array.
+ * 
+ * @param dst Destination array to copy into
+ * @param len Maximum number of bytes to copy (will zero-terminate
+ *                {@code len-1})
+ * 
+ * @return number of bytes copied
+ */
 stock zm_getConfigsFilePath(dst[], len = sizeof dst) {
     new tempLen = zm_getConfigsDirPath(dst, len);
     tempLen += formatex(dst[tempLen], len-tempLen-1, "%c", PATH_SEPARATOR);
