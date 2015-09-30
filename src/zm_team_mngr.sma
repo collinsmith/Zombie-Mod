@@ -74,6 +74,12 @@ registerConCmds() {
 }
 
 createForwards() {
+    createOnSpawn();
+    createOnKilled();
+    createOnApply();
+}
+
+createOnSpawn() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onSpawn");
     g_fw[onSpawn] = CreateMultiForward("zm_onSpawn", ET_IGNORE,
             FP_CELL, 
@@ -81,7 +87,9 @@ createForwards() {
     LoggerLogDebug(g_Logger,
             "g_fw[onSpawn] = %d",
             g_fw[onSpawn]);
+}
 
+createOnKilled() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onKilled");
     g_fw[onKilled] = CreateMultiForward("zm_onKilled", ET_IGNORE,
             FP_CELL, 
@@ -89,7 +97,9 @@ createForwards() {
     LoggerLogDebug(g_Logger,
             "g_fw[onKilled] = %d",
             g_fw[onKilled]);
+}
 
+createOnApply() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onApply");
     g_fw[onApply] = CreateMultiForward("zm_onApply", ET_IGNORE,
             FP_CELL, 
