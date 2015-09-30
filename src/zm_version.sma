@@ -1,4 +1,6 @@
 #define VERSION_STRING "1.0.0"
+#define EXTENSION_NAME "Version"
+
 #define MOD_NAME_LENGTH 31
 
 #include <logger>
@@ -11,9 +13,14 @@ static Logger: g_Logger = Invalid_Logger;
 static g_ModName[MOD_NAME_LENGTH+1];
 
 public zm_onExtensionInit() {
-    register_plugin("[ZM] Version", VERSION_STRING, "Tirant");
+    new name[32];
+    formatex(name, charsmax(name),
+            "[%L] %s",
+            LANG_SERVER, ZM_NAME_SHORT,
+            EXTENSION_NAME);
+    register_plugin(name, VERSION_STRING, "Tirant");
     zm_registerExtension(
-            .name = "Version",
+            .name = EXTENSION_NAME,
             .version = VERSION_STRING,
             .description = "Sets the game description string");
 
