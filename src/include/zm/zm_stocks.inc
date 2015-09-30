@@ -20,9 +20,12 @@
  */
 stock zm_registerConCmd(const command[], const function[], const description[], const access = ADMIN_CFG, const Logger: logger = Invalid_Logger) {
     new temp[32];
-    formatex(temp, charsmax(temp), "zm.%s", command);
+    new cmd[16];
+    formatex(cmd, charsmax(cmd), "%L", LANG_SERVER, ZM_NAME_SHORT);
+    strtolower(cmd);
+    formatex(temp, charsmax(temp), "%s.%s", cmd, command);
     register_concmd(
-            command,
+            temp,
             function,
             access,
             description);
