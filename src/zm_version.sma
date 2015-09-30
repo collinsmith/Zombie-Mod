@@ -31,7 +31,7 @@ public zm_onExtensionInit() {
 #endif
 
     configureModName();
-    register_forward(FM_GetGameDescription, "fw_onGetGameDescription");
+    register_forward(FM_GetGameDescription, "fm_onGetGameDescription");
     LoggerDestroy(g_Logger);
 }
 
@@ -51,7 +51,7 @@ configureModName() {
     LoggerLogDebug(g_Logger, "Mod name configured as \"%s\"", g_ModName);
 }
 
-public fw_onGetGameDescription() {
+public fm_onGetGameDescription() {
     forward_return(FMV_STRING, g_ModName);
     return FMRES_SUPERCEDE;
 }
