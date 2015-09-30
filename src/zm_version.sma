@@ -12,7 +12,10 @@ static g_ModName[MOD_NAME_LENGTH+1];
 
 public zm_onExtensionInit() {
     register_plugin("[ZM] Version", VERSION_STRING, "Tirant");
-    zm_registerExtension();
+    zm_registerExtension(
+            .name = "Version",
+            .version = VERSION_STRING,
+            .description = "Manages the custom game description");
 
     g_Logger = LoggerCreate();
 #if defined ZM_COMPILE_FOR_DEBUG
