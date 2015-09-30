@@ -3,6 +3,13 @@
 #endif
 #define _zm_debug_included
 
+/**
+ * Enables whether or not to compile in debug mode. Compiling in debug mode will
+ * enable many additional commands and features that are not required for
+ * standard use.
+ */
+#define ZM_COMPILE_FOR_DEBUG
+
 /*******************************************************************************
  * CONSTANTS
  ******************************************************************************/
