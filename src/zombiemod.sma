@@ -39,7 +39,9 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-    register_plugin(ZM_MOD_NAME, ZM_VERSION_STRING, "Tirant");
+    new version[16];
+    zm_getVersion(version);
+    register_plugin(ZM_MOD_NAME, version, "Tirant");
 
     new buildId[32];
     zm_getBuildId(buildId);
