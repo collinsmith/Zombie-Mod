@@ -3,8 +3,6 @@
 #endif
 #define _zm_stocks_included
 
-#define CONCMD_ACCESS ADMIN_CFG
-
 /*******************************************************************************
  * STOCKS
  ******************************************************************************/
@@ -20,13 +18,13 @@
  * @param description Brief description of the purpose for the command
  * @param logger      Logger to log when the command has been registered
  */
-stock zm_registerConCmd(const command[], const function[], const description[], const Logger: logger = Invalid_Logger) {
+stock zm_registerConCmd(const command[], const function[], const description[], const access = ADMIN_CFG, const Logger: logger = Invalid_Logger) {
     new temp[32];
     formatex(temp, charsmax(temp), "zm.%s", command);
     register_concmd(
             command,
             function,
-            CONCMD_ACCESS,
+            access,
             description);
 
     if (logger != Invalid_Logger) {
