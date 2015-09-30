@@ -6,6 +6,7 @@
 #pragma reqlib zombiemod
 
 #include "include\\zm\\zm_cfg.inc"
+#include "include\\zm\\zm_debug.inc"
 #include "include\\zm\\zm_lang.inc"
 #include "include\\zm\\zm_stocks.inc"
 #include "include\\zm\\zm_version.inc"
