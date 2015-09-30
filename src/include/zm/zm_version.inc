@@ -16,12 +16,34 @@
 #define ZM_VERSION 1
 
 /**
- * String representation of the version of ZM.
+ * Defines the string representation of the version of ZM.
  */
-stock const ZM_VERSION_STRING[] = "1.0.0";
+#define ZM_VERSION_STRING "1.0.0"
 
 /**
- * Populated a given array with the string representation for the build id for
+ * Returns the current version id (integer representation).
+ * 
+ * @return current version id of ZM.
+ */
+stock zm_getVersionId() {
+    return ZM_VERSION;
+}
+
+/**
+ * Populates a given array with the string representation for the version of
+ * ZM.
+ * 
+ * @param buildId String to populate
+ * @param len     Maximum number of bytes to copy (will copy up to len-1)
+ * 
+ * @return number of bytes copied
+ */
+stock zm_getVersion(version[], len = sizeof version) {
+    return copy(version, len - 1, ZM_VERSION_STRING);
+}
+
+/**
+ * Populates a given array with the string representation for the build id for
  * the current build of ZM.
  * 
  * @param buildId String to populate
