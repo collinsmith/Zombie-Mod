@@ -15,7 +15,7 @@ public zm_onExtensionInit() {
     zm_registerExtension(
             .name = "Version",
             .version = VERSION_STRING,
-            .description = "Manages the custom game description");
+            .description = "Sets the game description string");
 
     g_Logger = LoggerCreate();
 #if defined ZM_COMPILE_FOR_DEBUG
