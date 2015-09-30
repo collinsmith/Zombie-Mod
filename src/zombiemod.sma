@@ -139,6 +139,7 @@ public printVersion(id) {
             LANG_PLAYER, ZM_NAME,
             LANG_PLAYER, ZM_NAME_SHORT,
             buildId);
+    return PLUGIN_HANDLED;
 }
 
 public printExtensions(id) {
@@ -163,6 +164,7 @@ public printExtensions(id) {
     }
     
     console_print(id, "%d extensions registered.", g_numExtensions);
+    return PLUGIN_HANDLED;
 }
 
 /*******************************************************************************
