@@ -6,6 +6,7 @@
 
 #include "include\\zm\\zm_cfg.inc"
 #include "include\\zm\\zm_lang.inc"
+#include "include\\zm\\zm_stocks.inc"
 #include "include\\zm\\zm_version.inc"
 #include "include\\zm\\template\\extension_t.inc"
 
@@ -75,21 +76,18 @@ public plugin_precache() {
         LoggerLogDebug(g_Logger, "ZM_CFG_FILE=%s", temp);
     }
 
-    new zm_version[] = "zm.version";
-    register_concmd(
-            zm_version,
-            "printVersion",
-            _,
-            "Prints the version info");
-    LoggerLogDebug(g_Logger, "register_concmd \"%s\"", zm_version);
+    zm_registerConCmd(
+            .command = "version",
+            .function = "printVersion",
+            .description = "Prints the version info",
+            .access = ADMIN_ALL,
+            .logger = g_Logger);
 
-    new zm_exts[] = "zm.exts";
-    register_concmd(
-            zm_exts,
-            "printExtensions",
-            ADMIN_CFG,
-            "Prints the list of registered extensions");
-    LoggerLogDebug(g_Logger, "register_concmd \"%s\"", zm_exts);
+    zm_registerConCmd(
+            .command = "exts",
+            .function = "printExtensions",
+            .description = "Prints the list of registered extensions",
+            .logger = g_Logger);
 
     zm_onPrecache();
     zm_onInit();
