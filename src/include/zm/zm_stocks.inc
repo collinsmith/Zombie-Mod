@@ -28,6 +28,6 @@ stock zm_registerConCmd(const command[], const function[], const description[], 
             description);
 
     if (logger != Invalid_Logger) {
-        LoggerLogDebug(logger, "register_concmd \"%s\"", temp);
+        LoggerLogDebug2(logger, true, "register_concmd \"%s\"", temp);
     }
 }
