@@ -26,7 +26,8 @@ enum Forwards {
     onInit,
     onExtensionInit,
     onExtensionRegistered
-}; static g_fw[Forwards] = { 0, INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE };
+}; static g_fw[Forwards] = { 0, INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE,
+        INVALID_HANDLE };
 
 public plugin_natives() {
     register_library("zombiemod");
