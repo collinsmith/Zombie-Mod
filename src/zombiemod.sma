@@ -39,12 +39,10 @@ public plugin_natives() {
 }
 
 public plugin_precache() {
-    new version[16];
-    zm_getVersion(version);
-    register_plugin(ZM_MOD_NAME, version, "Tirant");
-
     new buildId[32];
     zm_getBuildId(buildId);
+    register_plugin(ZM_MOD_NAME, buildId, "Tirant");
+
     new desc[256];
     formatex(desc, charsmax(desc),
             "The current version of %s being used",
