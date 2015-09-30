@@ -5,7 +5,6 @@
 #include <logger>
 #include <hamsandwich>
 
-#include "include\\zm\\zm_debug.inc"
 #include "include\\zm\\zombiemod.inc"
 
 #include "include\\stocks\\flag_stocks.inc"
