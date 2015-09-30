@@ -16,3 +16,21 @@
 
 stock const TRUE[] = "true";
 stock const FALSE[] = "false";
+
+/*******************************************************************************
+ * STOCKS
+ ******************************************************************************/
+
+/**
+ * Returns whether or not ZM was compiled in debug mode.
+ * 
+ * @return {@literal true} if ZM was compiled for debug mode, otherwise
+ *         {@literal false}
+ */
+stock bool: zm_isDebugMode() {
+#if defined ZM_COMPILE_FOR_DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
