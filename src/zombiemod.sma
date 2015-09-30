@@ -97,24 +97,36 @@ public plugin_precache() {
 }
 
 zm_onPrecache() {
-    LoggerLogDebug(g_Logger, "Calling zm_onPrecache");
+    LoggerLogDebug(g_Logger, "Creating forward zm_onPrecache");
     g_fw[onPrecache] = CreateMultiForward("zm_onPrecache", ET_IGNORE);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onPrecache] = %d",
+            g_fw[onPrecache]);
+    LoggerLogDebug(g_Logger, "Calling zm_onPrecache");
     ExecuteForward(g_fw[onPrecache], g_fw[fwReturn]);
     DestroyForward(g_fw[onPrecache]);
     g_fw[onPrecache] = INVALID_HANDLE;
 }
 
 zm_onInit() {
-    LoggerLogDebug(g_Logger, "Calling zm_onInit");
+    LoggerLogDebug(g_Logger, "Creating forward zm_onInit");
     g_fw[onInit] = CreateMultiForward("zm_onInit", ET_IGNORE);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onInit] = %d",
+            g_fw[onInit]);
+    LoggerLogDebug(g_Logger, "Calling zm_onInit");
     ExecuteForward(g_fw[onInit], g_fw[fwReturn]);
     DestroyForward(g_fw[onInit]);
     g_fw[onInit] = INVALID_HANDLE;
 }
 
 zm_onExtensionInit() {
-    LoggerLogDebug(g_Logger, "Calling zm_onExtensionInit");
+    LoggerLogDebug(g_Logger, "Creating forward zm_onExtensionInit");
     g_fw[onExtensionInit] = CreateMultiForward("zm_onExtensionInit", ET_IGNORE);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onExtensionInit] = %d",
+            g_fw[onExtensionInit]);
+    LoggerLogDebug(g_Logger, "Calling zm_onExtensionInit");
     ExecuteForward(g_fw[onExtensionInit], g_fw[fwReturn]);
     DestroyForward(g_fw[onExtensionInit]);
     g_fw[onExtensionInit] = INVALID_HANDLE;
