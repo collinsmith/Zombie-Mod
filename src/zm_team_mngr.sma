@@ -5,6 +5,7 @@
 #include <logger>
 #include <hamsandwich>
 
+#include "include\\zm\\zm_debug.inc"
 #include "include\\zm\\zombiemod.inc"
 
 #include "include\\stocks\\flag_stocks.inc"
@@ -89,6 +90,14 @@ createForwards() {
     LoggerLogDebug(g_Logger,
             "g_fw[onKilled] = %d",
             g_fw[onKilled]);
+
+    LoggerLogDebug(g_Logger, "Creating forward zm_onApply");
+    g_fw[onApply] = CreateMultiForward("zm_onApply", ET_IGNORE,
+            FP_CELL, 
+            FP_CELL);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onApply] = %d",
+            g_fw[onApply]);
 }
 
 public ham_onSpawn_Post(id) {
@@ -99,8 +108,9 @@ public ham_onSpawn_Post(id) {
     
     setFlag(g_flagAlive, id);
     new bool: isZombie = isUserZombie(id);
-    //ExecuteForward(g_fw[onRefresh], g_fw[fwReturn], id, isZombie);
-    LoggerLogDebug(g_Logger, "Calling zm_onSpawn(%d, isZombie=%s) for %N", id, isZombie ? "true" : "false", id);
+    LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, isZombie ? TRUE : FALSE, id);
+    ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, isZombie);
+    LoggerLogDebug(g_Logger, "Calling zm_onSpawn(%d, isZombie=%s) for %N", id, isZombie ? TRUE : FALSE, id);
     ExecuteForward(g_fw[onSpawn], g_fw[fwReturn], id, isZombie);
     return HAM_HANDLED;
 }
@@ -151,9 +161,6 @@ public printPlayers(id) {
         "ALIVE",
         "CONNECTED");
 
-    new const ALIVE[] = "Y";
-    new const CONNECTED[] = "Y";
-
     new name[32];
     new players = get_playersnum(.flag = 1);
     for (new i = 1; i <= players; i++) {
@@ -163,8 +170,8 @@ public printPlayers(id) {
                 i,
                 name,
                 isUserZombie(i) ? 'Z' : 'H',
-                isUserAlive(i) ? ALIVE : NULL_STRING,
-                isUserConnected(i) ? CONNECTED : NULL_STRING);
+                isUserAlive(i) ? TRUE : NULL_STRING,
+                isUserConnected(i) ? TRUE : NULL_STRING);
     }
     
     console_print(id, "%d players found.", players);
@@ -179,8 +186,6 @@ public printZombies(id) {
         "NAME",
         "ALIVE");
 
-    new const ALIVE[] = "Y";
-
     new name[32];
     new players = get_playersnum(.flag = 0);
     for (new i = 1; i <= players; i++) {
@@ -193,7 +198,7 @@ public printZombies(id) {
                 "%2d. %8.8s %5s",
                 i,
                 name,
-                isUserAlive(i) ? ALIVE : NULL_STRING);
+                isUserAlive(i) ? TRUE : NULL_STRING);
     }
     
     console_print(id, "%d zombies found.", players);
@@ -208,8 +213,6 @@ public printHumans(id) {
         "NAME",
         "ALIVE");
 
-    new const ALIVE[] = "Y";
-
     new name[32];
     new players = get_playersnum(.flag = 0);
     for (new i = 1; i <= players; i++) {
@@ -222,7 +225,7 @@ public printHumans(id) {
                 "%2d. %8.8s %5s",
                 i,
                 name,
-                isUserAlive(i) ? ALIVE : NULL_STRING);
+                isUserAlive(i) ? TRUE : NULL_STRING);
     }
     
     console_print(id, "%d humans found.", players);
