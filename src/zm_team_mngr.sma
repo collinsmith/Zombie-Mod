@@ -68,10 +68,13 @@ public zm_onExtensionInit() {
     RegisterHam(Ham_Spawn, "player", "ham_onSpawn_Post", 1);
     RegisterHam(Ham_Killed, "player", "ham_onKilled", 0);
 
-    new msgid = get_user_msgid("TeamInfo");
-    LoggerLogDebug(g_Logger, "get_user_msgid(\"TeamInfo\")=%d", msgid);
-    new id = register_message(msgid, "msg_onTeamInfo");
-    LoggerLogDebug(g_Logger, "register_message(msgid, \"msg_onTeamInfo\")=%d", id);
+    new TeamInfo = get_user_msgid("TeamInfo");
+    if (register_message(TeamInfo, "msg_onTeamInfo") == 0) {
+        LoggerLogError(g_Logger,
+                "register_message(TeamInfo, \"msg_onTeamInfo\") returned 0");
+        set_fail_state("register_message(TeamInfo, \"msg_onTeamInfo\") \
+                returned 0");
+    }
 }
 
 registerConCmds() {
