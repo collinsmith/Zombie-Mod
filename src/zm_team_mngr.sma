@@ -262,6 +262,7 @@ bool: isUserHuman(const id) {
 bool: respawn(const id, const bool: force = false) {
     assert isValidId(id);
     if (isUserAlive(id) && !force) {
+        LoggerLogDebug(g_Logger, "Respawn blocked for %N", id);
         return false;
     }
 
