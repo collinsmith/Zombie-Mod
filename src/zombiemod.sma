@@ -130,6 +130,11 @@ zm_onExtensionInit() {
     ExecuteForward(g_fw[onExtensionInit], g_fw[fwReturn]);
     DestroyForward(g_fw[onExtensionInit]);
     g_fw[onExtensionInit] = INVALID_HANDLE;
+
+    if (g_fw[onExtensionRegistered] != INVALID_HANDLE) {
+        DestroyForward(g_fw[onExtensionRegistered]);
+        g_fw[onExtensionRegistered] = INVALID_HANDLE;
+    }
 }
 
 executeZMCfg() {
@@ -189,6 +194,12 @@ public printExtensions(id) {
 //         const description[] = NULL_STRING);
 public ZM_Extension: zm_registerExtension(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 3, numParams)) {
+        return Invalid_Extension;
+    }
+
+    if (g_fw[onExtensionInit] == INVALID_HANDLE) {
+        LoggerLogError(g_Logger,
+                "Cannot register extensions outside of zm_onExtensionInit");
         return Invalid_Extension;
     }
 
