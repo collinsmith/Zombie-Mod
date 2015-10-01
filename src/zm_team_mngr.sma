@@ -72,8 +72,8 @@ public zm_onExtensionInit() {
     if (register_message(TeamInfo, "msg_onTeamInfo") == 0) {
         LoggerLogError(g_Logger,
                 "register_message(TeamInfo, \"msg_onTeamInfo\") returned 0");
-        set_fail_state("register_message(TeamInfo, \"msg_onTeamInfo\") \
-                returned 0");
+        set_fail_state(
+                "register_message(TeamInfo, \"msg_onTeamInfo\") returned 0");
     }
 }
 
