@@ -342,8 +342,8 @@ ZM_State_Change: cure(const id, const curor = -1, const bool: blockable = true) 
     assert isValidId(id);
     assert curor == -1 || isValidId(curor);
     if (isUserHuman(id)) {
-        LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
-        ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
+        LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, FALSE, id);
+        ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, false);
         return ZM_STATE_CHANGE_DID_NOT_CHANGE;
     }
 
@@ -360,8 +360,8 @@ ZM_State_Change: cure(const id, const curor = -1, const bool: blockable = true) 
 
     setFlag(g_flagZombie, id);
     cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
-    LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
-    ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
+    LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, FALSE, id);
+    ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, false);
     
     LoggerLogDebug(g_Logger, "Calling zm_onAfterCured(%d, %d) for %N", id, curor, id);
     ExecuteForward(g_fw[onAfterCured], g_fw[fwReturn], id, curor);
