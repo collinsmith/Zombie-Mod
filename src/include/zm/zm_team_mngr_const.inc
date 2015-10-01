@@ -8,10 +8,10 @@
  ******************************************************************************/
 
 enum ZM_Team {
-    ZM_TEAM_UNASSIGNED = CS_TEAM_UNASSIGNED,
-    ZM_TEAM_ZOMBIE = CS_TEAM_T,
-    ZM_TEAM_HUMAN = CS_TEAM_CT,
-    ZM_TEAM_SPECTATOR = CS_TEAM_SPECTATOR,
+    ZM_TEAM_UNASSIGNED = 0,
+    ZM_TEAM_ZOMBIE = 1,
+    ZM_TEAM_HUMAN = 2,
+    ZM_TEAM_SPECTATOR = 3,
 }
 
 enum ZM_State_Change {
