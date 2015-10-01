@@ -16,6 +16,7 @@
 
 stock const TRUE[] = "true";
 stock const FALSE[] = "false";
+stock const NULL[] = "null";
 stock const ZOMBIE[] = "zombie";
 stock const HUMAN[] = "human";
 
