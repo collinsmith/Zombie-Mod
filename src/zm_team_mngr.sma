@@ -256,15 +256,23 @@ public ham_onKilled(killer, victim, shouldgib) {
     return HAM_HANDLED;
 }
 
-public msg_onTeamInfo() {
+public msg_onTeamInfo(const msgId, const msgDest, const entId) {
+    if (msgDest != MSG_ALL && msgDest != MSG_BROADCAST) {
+        return;
+    }
+
     new id = get_msg_arg_int(1);
+    assert isValidId(id);
 
     new team[2];
     get_msg_arg_string(2, team, charsmax(team));
     LoggerLogDebug(g_Logger, "msg_onTeamInfo(%d, %s)", id, team);
     switch (team[0]) {
         case 'C': cure(.id = id, .blockable = false);
+        case 'S': return;
         case 'T': infect(.id = id, .blockable = false);
+        case 'U': return;
+        default: assert false;
     }
 }
 
@@ -320,7 +328,7 @@ ZM_State_Change: infect(const id, const infector = -1, const bool: blockable = t
     ExecuteForward(g_fw[onInfected], g_fw[fwReturn], id, infector);
 
     setFlag(g_flagZombie, id);
-    cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
+    //cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
     
@@ -362,7 +370,7 @@ ZM_State_Change: cure(const id, const curor = -1, const bool: blockable = true) 
     ExecuteForward(g_fw[onCured], g_fw[fwReturn], id, curor);
 
     setFlag(g_flagZombie, id);
-    cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
+    //cs_set_user_team(id, CsTeams:(ZM_TEAM_HUMAN));
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, FALSE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, false);
     
