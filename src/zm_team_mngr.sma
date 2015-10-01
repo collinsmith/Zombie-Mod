@@ -224,7 +224,7 @@ public client_putinserver(id) {
     setFlag(g_flagConnected, id);
 }
 
-public client_disconnect(id) {
+public client_disconnect(id) { //Ignoreable: warning 233: recursive function "client_disconnect"
     unsetFlag(g_flagConnected, id);
     unsetFlag(g_flagAlive, id);
 }
