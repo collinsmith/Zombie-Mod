@@ -67,8 +67,8 @@ forward zm_onExtensionRegistered(
  * version. Extensions should be registered in an effort to maintain good
  * "house-keeping" of a server to keep track of plugins which rely on ZM.
  * Additionally, any CVars that are registered by these extensions will be
- * automatically added to the ZM CFG file when it is created. Extensions should
- * be registered during {@link #zm_onExtensionInit()}.
+ * automatically added to the ZM CFG file when it is created. Extensions can
+ * only be registered during {@link #zm_onExtensionInit()}.
  * 
  * @param name    Name of the extension, {@literal ""} for plugin file name
  * @param desc    Brief description of the extension
