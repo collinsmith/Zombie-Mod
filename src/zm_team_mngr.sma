@@ -67,6 +67,8 @@ public zm_onExtensionInit() {
 
     RegisterHam(Ham_Spawn, "player", "ham_onSpawn_Post", 1);
     RegisterHam(Ham_Killed, "player", "ham_onKilled", 0);
+
+    register_message(get_user_msgid("TeamInfo"), "msg_onTeamInfo");
 }
 
 registerConCmds() {
@@ -237,6 +239,15 @@ public ham_onKilled(killer, victim, shouldgib) {
     LoggerLogDebug(g_Logger, "Calling zm_onKilled(killer=%d, victim=%d) for %N", killer, victim, victim);
     ExecuteForward(g_fw[onKilled], g_fw[fwReturn], killer, victim);
     return HAM_HANDLED;
+}
+
+public msg_onTeamInfo() {
+    static team[2];
+    get_msg_arg_string(2, team, charsmax(team));
+    switch (team[0]) {
+        case 'C': cure(.id = get_msg_arg_int(1), .blockable = false);
+        case 'T': infect(.id = get_msg_arg_int(1), .blockable = false);
+    }
 }
 
 bool: isUserConnected(const id) {
