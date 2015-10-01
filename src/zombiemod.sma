@@ -177,7 +177,7 @@ public printExtensions(id) {
                     .status = status,
                     .len5 = charsmax(status));
             console_print(id,
-                    "%d. %8.8s %8.8s %8.8s",
+                    "%d. %16.16s %8.8s %8.8s",
                     i+1,
                     extension[ext_Name],
                     extension[ext_Version],
