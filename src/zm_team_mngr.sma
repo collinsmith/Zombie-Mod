@@ -256,7 +256,7 @@ public printPlayers(id) {
                 "%2d. %8.8s %5c %5s %s",
                 i,
                 name,
-                isUserZombie(i) ? 'Z' : 'H',
+                isUserZombie(i) ? ZOMBIE[0] : HUMAN[0],
                 isUserAlive(i) ? TRUE : NULL_STRING,
                 isUserConnected(i) ? TRUE : NULL_STRING);
     }
