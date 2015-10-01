@@ -90,13 +90,15 @@ public plugin_precache() {
             .logger = g_Logger);
 
     zm_onPrecache();
-    
-    executeZMCfg();
 }
 
 public plugin_init() {
     zm_onInit();
     zm_onExtensionInit();
+}
+
+public plugin_cfg() {
+    executeZMCfg();
 }
 
 zm_onPrecache() {
