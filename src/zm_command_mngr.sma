@@ -67,6 +67,9 @@ public zm_onExtensionInit() {
     LoggerSetVerbosity(All_Loggers, Severity_Lowest);
 #endif
 
+    registerConCmds();
+    createForwards();
+    
     g_pCvar_Prefixes = create_cvar(
             "zm_command_prefixes",
             "/.!",
@@ -77,6 +80,53 @@ public zm_onExtensionInit() {
     new prefixes[8];
     get_pcvar_string(g_pCvar_Prefixes, prefixes, charsmax(prefixes));
     cvar_onPrefixesAltered(g_pCvar_Prefixes, NULL_STRING, prefixes);
+}
+
+registerConCmds() {
+    zm_registerConCmd(
+            .command = "cmds",
+            .function = "printCommands",
+            .description = "Prints the list of commands with their details",
+            .logger = g_Logger);
+
+    zm_registerConCmd(
+            .command = "commands",
+            .function = "printCommands",
+            .description = "Prints the list of commands with their details",
+            .logger = g_Logger);
+
+    zm_registerConCmd(
+            .command = "aliases",
+            .function = "printAliases",
+            .description = "Prints the list of commands with their details",
+            .logger = g_Logger);
+}
+
+createForwards() {
+    createOnBeforeCommand();
+    createOnCommand();
+}
+
+createOnBeforeCommand() {
+    LoggerLogDebug(g_Logger, "Creating forward zm_onBeforeCommand");
+    g_fw[onBeforeCommand] = CreateMultiForward("zm_onBeforeCommand",
+            ET_CONTINUE,
+            FP_CELL, 
+            FP_CELL);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onBeforeCommand] = %d",
+            g_fw[onBeforeCommand]);
+}
+
+createOnCommand() {
+    LoggerLogDebug(g_Logger, "Creating forward zm_onCommand");
+    g_fw[onCommand] = CreateMultiForward("zm_onCommand",
+            ET_IGNORE,
+            FP_CELL, 
+            FP_CELL);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onCommand] = %d",
+            g_fw[onCommand]);
 }
 
 public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
@@ -117,4 +167,20 @@ public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
     }
     
     ExecuteForward(g_fw[onPrefixesChanged], g_fw[fwReturn], oldValue, newValue);
+}
+
+/*******************************************************************************
+ * Console Commands
+ ******************************************************************************/
+
+public printCommands(id) {
+    console_print(id, "Commands:");
+
+    console_print(id, "%d commands found.", g_numCommands);
+}
+
+public printAliases(id) {
+    console_print(id, "Aliases:");
+
+    console_print(id, "%d aliases found.", 0);
 }
