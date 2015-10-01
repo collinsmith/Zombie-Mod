@@ -75,8 +75,8 @@ public zm_onExtensionInit() {
     hook_cvar_change(g_pCvar_Prefixes, "cvar_onPrefixesAltered");
 
     new prefixes[8];
-    get_pcvar_string(g_pcvar_prefixes, prefixes, charsmax(prefixes));
-    cvar_onPrefixesAltered(g_pcvar_prefixes, NULL_STRING, prefixes);
+    get_pcvar_string(g_pCvar_Prefixes, prefixes, charsmax(prefixes));
+    cvar_onPrefixesAltered(g_pCvar_Prefixes, NULL_STRING, prefixes);
 }
 
 public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
@@ -97,10 +97,10 @@ public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
     
     
     new i = 0;
-    new szTemp[2];
+    new temp[2];
     while (newValue[i] != EOS) {
-        szTemp[0] = newValue[i];
-        TrieSetCell(g_prefixMap, szTemp, i);
+        temp[0] = newValue[i];
+        TrieSetCell(g_prefixesMap, temp, i);
         i++;
     }
     
