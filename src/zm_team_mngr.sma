@@ -119,7 +119,8 @@ createCuredForwards() {
 
 createOnSpawn() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onSpawn");
-    g_fw[onSpawn] = CreateMultiForward("zm_onSpawn", ET_IGNORE,
+    g_fw[onSpawn] = CreateMultiForward("zm_onSpawn",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -129,7 +130,8 @@ createOnSpawn() {
 
 createOnKilled() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onKilled");
-    g_fw[onKilled] = CreateMultiForward("zm_onKilled", ET_IGNORE,
+    g_fw[onKilled] = CreateMultiForward("zm_onKilled",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
