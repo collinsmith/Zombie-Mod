@@ -4,9 +4,9 @@
 
 #include <amxmodx>
 #include <logger>
-#include <cstrike>
 #include <hamsandwich>
 
+#include "include\\zm\\cs_team_changer.inc"
 #include "include\\zm\\zombiemod.inc"
 #include "include\\zm\\zm_team_mngr_const.inc"
 
@@ -328,7 +328,7 @@ ZM_State_Change: infect(const id, const infector = -1, const bool: blockable = t
     ExecuteForward(g_fw[onInfected], g_fw[fwReturn], id, infector);
 
     setFlag(g_flagZombie, id);
-    //cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
+    cs_set_team_id(id, ZM_TEAM_ZOMBIE);
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
     
@@ -370,7 +370,7 @@ ZM_State_Change: cure(const id, const curor = -1, const bool: blockable = true) 
     ExecuteForward(g_fw[onCured], g_fw[fwReturn], id, curor);
 
     setFlag(g_flagZombie, id);
-    //cs_set_user_team(id, CsTeams:(ZM_TEAM_HUMAN));
+    cs_set_team_id(id, ZM_TEAM_HUMAN);
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, FALSE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, false);
     
