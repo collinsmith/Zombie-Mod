@@ -133,7 +133,9 @@ createOnKilled() {
 
 createOnApply() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onApply");
-    g_fw[onApply] = CreateMultiForward("zm_onApply", ET_IGNORE,
+    g_fw[onApply] = CreateMultiForward(
+            "zm_onApply",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -143,7 +145,8 @@ createOnApply() {
 
 createOnBeforeInfected() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onBeforeInfected");
-    g_fw[onBeforeInfected] = CreateMultiForward("zm_onBeforeInfected", ET_IGNORE,
+    g_fw[onBeforeInfected] = CreateMultiForward(
+            "zm_onBeforeInfected",
             ET_CONTINUE,
             FP_CELL,
             FP_CELL, 
@@ -155,7 +158,9 @@ createOnBeforeInfected() {
 
 createOnInfected() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onInfected");
-    g_fw[onInfected] = CreateMultiForward("zm_onInfected", ET_IGNORE,
+    g_fw[onInfected] = CreateMultiForward(
+            "zm_onInfected",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -165,7 +170,9 @@ createOnInfected() {
 
 createOnAfterInfected() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onAfterInfected");
-    g_fw[onAfterInfected] = CreateMultiForward("zm_onAfterInfected", ET_IGNORE,
+    g_fw[onAfterInfected] = CreateMultiForward(
+            "zm_onAfterInfected",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -175,7 +182,8 @@ createOnAfterInfected() {
 
 createOnBeforeCured() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onBeforeCured");
-    g_fw[onBeforeCured] = CreateMultiForward("zm_onBeforeCured", ET_IGNORE,
+    g_fw[onBeforeCured] = CreateMultiForward(
+            "zm_onBeforeCured",
             ET_CONTINUE,
             FP_CELL,
             FP_CELL, 
@@ -187,7 +195,9 @@ createOnBeforeCured() {
 
 createOnCured() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onCured");
-    g_fw[onCured] = CreateMultiForward("zm_onCured", ET_IGNORE,
+    g_fw[onCured] = CreateMultiForward(
+            "zm_onCured",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -197,7 +207,9 @@ createOnCured() {
 
 createOnAfterCured() {
     LoggerLogDebug(g_Logger, "Creating forward zm_onAfterCured");
-    g_fw[onAfterCured] = CreateMultiForward("zm_onAfterCured", ET_IGNORE,
+    g_fw[onAfterCured] = CreateMultiForward(
+            "zm_onAfterCured",
+            ET_IGNORE,
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -242,11 +254,14 @@ public ham_onKilled(killer, victim, shouldgib) {
 }
 
 public msg_onTeamInfo() {
-    static team[2];
+    new id = get_msg_arg_int(1);
+
+    new team[2];
     get_msg_arg_string(2, team, charsmax(team));
+    LoggerLogDebug(g_Logger, "msg_onTeamInfo(%d, %s)", id, team);
     switch (team[0]) {
-        case 'C': cure(.id = get_msg_arg_int(1), .blockable = false);
-        case 'T': infect(.id = get_msg_arg_int(1), .blockable = false);
+        case 'C': cure(.id = id, .blockable = false);
+        case 'T': infect(.id = id, .blockable = false);
     }
 }
 
