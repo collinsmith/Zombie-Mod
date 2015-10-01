@@ -187,6 +187,15 @@ createOnAfterCured() {
             g_fw[onAfterCured]);
 }
 
+public client_putinserver(id) {
+    setFlag(g_flagConnected, id);
+}
+
+public client_disconnect(id) {
+    unsetFlag(g_flagConnected, id);
+    unsetFlag(g_flagAlive, id);
+}
+
 public ham_onSpawn_Post(id) {
     if (!is_user_alive(id)) {
         unsetFlag(g_flagAlive, id);
@@ -249,19 +258,27 @@ public printPlayers(id) {
         "CONNECTED");
 
     new name[32];
-    new players = get_playersnum(.flag = 1);
-    for (new i = 1; i <= players; i++) {
-        get_user_name(i, name, charsmax(name));
-        console_print(id,
-                "%2d. %8.8s %5c %5s %s",
-                i,
-                name,
-                isUserZombie(i) ? ZOMBIE[0] : HUMAN[0],
-                isUserAlive(i) ? TRUE : NULL_STRING,
-                isUserConnected(i) ? TRUE : NULL_STRING);
+    new playersConnected = 0;
+    for (new i = 1; i <= MaxClients; i++) {
+        if (isUserConnected(i)) {
+            playersConnected++;
+            get_user_name(i, name, charsmax(name));
+            console_print(id,
+                    "%2d. %8.8s %5c %5s %s",
+                    i,
+                    name,
+                    isUserZombie(i) ? ZOMBIE[0] : HUMAN[0],
+                    isUserAlive(i) ? TRUE : NULL_STRING,
+                    TRUE);
+        } else {
+            name[0] = EOS;
+            console_print(id, "%2d.", i);
+        }
+
+        
     }
     
-    console_print(id, "%d players found.", players);
+    console_print(id, "%d players connected.", playersConnected);
 }
 
 public printZombies(id) {
