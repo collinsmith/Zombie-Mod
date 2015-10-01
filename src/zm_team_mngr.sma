@@ -68,7 +68,10 @@ public zm_onExtensionInit() {
     RegisterHam(Ham_Spawn, "player", "ham_onSpawn_Post", 1);
     RegisterHam(Ham_Killed, "player", "ham_onKilled", 0);
 
-    register_message(get_user_msgid("TeamInfo"), "msg_onTeamInfo");
+    new msgid = get_user_msgid("TeamInfo");
+    LoggerLogDebug(g_Logger, "get_user_msgid(\"TeamInfo\")=%d", msgid);
+    new id = register_message(msgid, "msg_onTeamInfo");
+    LoggerLogDebug(g_Logger, "register_message(msgid, \"msg_onTeamInfo\")=%d", id);
 }
 
 registerConCmds() {
