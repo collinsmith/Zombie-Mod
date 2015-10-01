@@ -26,7 +26,7 @@
  * This native will automatically send a TeamInfo message. Will also change the
  * team offset and the team index declared by AMX Mod X extension.
  */
-native cs_set_team(id, {any,CsTeams,ZM_Team}:team);
+native cs_set_team(id, {any,CsTeams}:team);
 
 /**
  * Changes the player's team index declared by AMX Mod X extension. The team
@@ -34,15 +34,15 @@ native cs_set_team(id, {any,CsTeams,ZM_Team}:team);
  * 
  * There will not be a TeamInfo message.
  */
-native cs_set_team_id(id, {any,CsTeams,ZM_Team}:team);
+native cs_set_team_id(id, {any,CsTeams}:team);
 
 /**
  * Changes the player's team offset. Scores' table will not be touched.
  */
-native cs_set_team_offset(id, {any,CsTeams,ZM_Team}:team);
+native cs_set_team_offset(id, {any,CsTeams}:team);
 
 /**
  * Sends a fast TeamInfo message. The player will be transfered at the team you
  * want but only in the scores' table.
  */
-native cs_set_team_tablescore(id, {any,CsTeams,ZM_Team}:team);
+native cs_set_team_tablescore(id, {any,CsTeams}:team);
