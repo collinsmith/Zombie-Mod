@@ -1,11 +1,14 @@
 #define VERSION_STRING "1.0.0"
 #define EXTENSION_NAME "Team Manager"
+#define ZM_PLAYERS_PRINT_EMPTY
 
 #include <amxmodx>
 #include <logger>
+#include <cstrike>
 #include <hamsandwich>
 
 #include "include\\zm\\zombiemod.inc"
+#include "include\\zm\\zm_team_mngr_const.inc"
 
 #include "include\\stocks\\flag_stocks.inc"
 #include "include\\stocks\\param_test_stocks.inc"
@@ -27,6 +30,19 @@ enum Forwards {
 static g_flagConnected;
 static g_flagAlive;
 static g_flagZombie;
+
+public plugin_natives() {
+    register_library("zm_team_mngr");
+
+    register_native("zm_isUserConnected", "zm_isUserConnected", 0);
+    register_native("zm_isUserAlive", "zm_isUserAlive", 0);
+    register_native("zm_isUserZombie", "zm_isUserZombie", 0);
+
+    register_native("zm_respawn", "zm_respawn", 0);
+
+    register_native("zm_infect", "zm_infect", 0);
+    register_native("zm_cure", "zm_cure", 0);
+}
 
 public zm_onExtensionInit() {
     new name[32];
@@ -239,7 +255,102 @@ bool: isUserZombie(const id) {
 }
 
 bool: isUserHuman(const id) {
+    assert isValidId(id);
     return !isUserZombie(id);
+}
+
+bool: respawn(const id, const bool: force = false) {
+    assert isValidId(id);
+    if (isUserAlive(id) && !force) {
+        return false;
+    }
+
+    ExecuteHamB(Ham_CS_RoundRespawn, id);
+    return true;
+}
+
+ZM_State_Change: infect(const id, const infector = -1, const bool: blockable = true) {
+    assert isValidId(id);
+    assert infector == -1 || isValidId(infector);
+    if (isUserZombie(id)) {
+        LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
+        ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
+        return ZM_STATE_CHANGE_DID_NOT_CHANGE;
+    }
+
+    LoggerLogDebug(g_Logger, "Calling zm_onBeforeInfected(%d, %d, blockable=%s) for %N", id, infector, blockable ? TRUE : FALSE, id);
+    ExecuteForward(g_fw[onBeforeInfected], g_fw[fwReturn], id, infector, blockable);
+    if (blockable && g_fw[fwReturn] == PLUGIN_HANDLED) {
+        LoggerLogDebug(g_Logger, "Infection blocked for %N", id);
+        return ZM_STATE_CHANGE_BLOCKED;
+    }
+
+    //hideMenus(id);
+    LoggerLogDebug(g_Logger, "Calling zm_onInfected(%d, %d) for %N", id, infector, id);
+    ExecuteForward(g_fw[onInfected], g_fw[fwReturn], id, infector);
+
+    setFlag(g_flagZombie, id);
+    cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
+    LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
+    ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
+    
+    LoggerLogDebug(g_Logger, "Calling zm_onAfterInfected(%d, %d) for %N", id, infector, id);
+    ExecuteForward(g_fw[onAfterInfected], g_fw[fwReturn], id, infector);
+
+#if defined ZM_COMPILE_FOR_DEBUG
+    new name[32];
+    get_user_name(id, name, 31);
+    if (isValidId(infector)) {
+        new other[32];
+        get_user_name(infector, other, 31);
+        LoggerLogDebug(g_Logger, "%s infected %s", other, name);
+    } else {
+        LoggerLogDebug(g_Logger, "%s has been infected", name);
+    }
+#endif
+    return ZM_STATE_CHANGE_CHANGED;
+}
+
+ZM_State_Change: cure(const id, const curor = -1, const bool: blockable = true) {
+    assert isValidId(id);
+    assert curor == -1 || isValidId(curor);
+    if (isUserHuman(id)) {
+        LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
+        ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
+        return ZM_STATE_CHANGE_DID_NOT_CHANGE;
+    }
+
+    LoggerLogDebug(g_Logger, "Calling zm_onBeforeCured(%d, %d, blockable=%s) for %N", id, curor, blockable ? TRUE : FALSE, id);
+    ExecuteForward(g_fw[onBeforeCured], g_fw[fwReturn], id, curor, blockable);
+    if (blockable && g_fw[fwReturn] == PLUGIN_HANDLED) {
+        LoggerLogDebug(g_Logger, "Curing blocked for %N", id);
+        return ZM_STATE_CHANGE_BLOCKED;
+    }
+
+    //hideMenus(id);
+    LoggerLogDebug(g_Logger, "Calling zm_onCured(%d, %d) for %N", id, curor, id);
+    ExecuteForward(g_fw[onCured], g_fw[fwReturn], id, curor);
+
+    setFlag(g_flagZombie, id);
+    cs_set_user_team(id, CsTeams:(ZM_TEAM_ZOMBIE));
+    LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
+    ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
+    
+    LoggerLogDebug(g_Logger, "Calling zm_onAfterCured(%d, %d) for %N", id, curor, id);
+    ExecuteForward(g_fw[onAfterCured], g_fw[fwReturn], id, curor);
+
+#if defined ZM_COMPILE_FOR_DEBUG
+    new name[32];
+    get_user_name(id, name, 31);
+    if (isValidId(curor)) {
+        new other[32];
+        get_user_name(curor, other, 31);
+        LoggerLogDebug(g_Logger, "%s cured %s", other, name);
+    } else {
+        LoggerLogDebug(g_Logger, "%s has been cured", name);
+    }
+#endif
+    return ZM_STATE_CHANGE_CHANGED;
 }
 
 /*******************************************************************************
@@ -272,7 +383,9 @@ public printPlayers(id) {
                     TRUE);
         } else {
             name[0] = EOS;
+#if defined ZM_PLAYERS_PRINT_EMPTY
             console_print(id, "%2d.", i);
+#endif
         }
 
         
@@ -291,12 +404,13 @@ public printZombies(id) {
         "ALIVE");
 
     new name[32];
-    new players = get_playersnum(.flag = 0);
-    for (new i = 1; i <= players; i++) {
-        if (!isUserZombie(i)) {
+    new numZombies = 0;
+    for (new i = 1; i <= MaxClients; i++) {
+        if (!isUserZombie(i) || !isUserConnected(i)) {
             continue;
         }
 
+        numZombies++;
         get_user_name(i, name, charsmax(name));
         console_print(id,
                 "%2d. %8.8s %5s",
@@ -305,7 +419,7 @@ public printZombies(id) {
                 isUserAlive(i) ? TRUE : NULL_STRING);
     }
     
-    console_print(id, "%d zombies found.", players);
+    console_print(id, "%d zombies found.", numZombies);
 }
 
 public printHumans(id) {
@@ -318,12 +432,13 @@ public printHumans(id) {
         "ALIVE");
 
     new name[32];
-    new players = get_playersnum(.flag = 0);
-    for (new i = 1; i <= players; i++) {
-        if (!isUserHuman(i)) {
+    new numHumans = 0;
+    for (new i = 1; i <= MaxClients; i++) {
+        if (!isUserHuman(i) || !isUserConnected(i)) {
             continue;
         }
 
+        numHumans++;
         get_user_name(i, name, charsmax(name));
         console_print(id,
                 "%2d. %8.8s %5s",
@@ -332,9 +447,123 @@ public printHumans(id) {
                 isUserAlive(i) ? TRUE : NULL_STRING);
     }
     
-    console_print(id, "%d humans found.", players);
+    console_print(id, "%d humans found.", numHumans);
 }
 
 /*******************************************************************************
  * Natives
  ******************************************************************************/
+
+// native bool: zm_isUserConnected(const id);
+public bool: zm_isUserConnected(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 1, numParams)) {
+        return false;
+    }
+
+    new id = get_param(1);
+    if (!isValidId(id)) {
+        LoggerLogWarn(g_Logger, "Invalid player id specified: %d", id);
+        return false;
+    }
+
+    return isUserConnected(id);
+}
+
+// native bool: zm_isUserAlive(const id);
+public bool: zm_isUserAlive(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 1, numParams)) {
+        return false;
+    }
+
+    new id = get_param(1);
+    if (!isValidId(id)) {
+        LoggerLogWarn(g_Logger, "Invalid player id specified: %d", id);
+        return false;
+    }
+
+    return isUserAlive(id);
+}
+
+// native bool: zm_isUserZombie(const id);
+public bool: zm_isUserZombie(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 1, numParams)) {
+        return false;
+    }
+
+    new id = get_param(1);
+    if (!isValidId(id)) {
+        LoggerLogWarn(g_Logger, "Invalid player id specified: %d", id);
+        return false;
+    }
+
+    return isUserZombie(id);
+}
+
+// native bool: zm_respawn(const id, const bool: force = false);
+public bool: zm_respawn(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 2, numParams)) {
+        return false;
+    }
+
+    new id = get_param(1);
+    if (!isValidId(id)) {
+        LoggerLogWarn(g_Logger, "Invalid player id specified: %d", id);
+        return false;
+    }
+
+    if (!isUserConnected(id)) {
+        LoggerLogError(g_Logger,
+                "Player with id specified is not connected: %d", id);
+        return false;
+    }
+
+    return respawn(id, bool:(get_param(2)));
+}
+
+// native ZM_State_Change: zm_infect(
+//         const id,
+//         const infector = -1,
+//         const bool: blockable = true);
+public ZM_State_Change: zm_infect(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 3, numParams)) {
+        return ZM_STATE_CHANGE_ERROR;
+    }
+
+    new id = get_param(1);
+    if (!isValidId(id)) {
+        LoggerLogError(g_Logger, "Invalid player id specified: %d", id);
+        return ZM_STATE_CHANGE_ERROR;
+    }
+
+    if (!isUserConnected(id)) {
+        LoggerLogError(g_Logger,
+                "Player with id specified is not connected: %d", id);
+        return ZM_STATE_CHANGE_ERROR;
+    }
+
+    return infect(id, get_param(2), bool:(get_param(3)));
+}
+
+// native ZM_State_Change: zm_cure(
+//         const id,
+//         const curor = -1,
+//         const bool: blockable = true);
+public ZM_State_Change: zm_cure(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 3, numParams)) {
+        return ZM_STATE_CHANGE_ERROR;
+    }
+
+    new id = get_param(1);
+    if (!isValidId(id)) {
+        LoggerLogError(g_Logger, "Invalid player id specified: %d", id);
+        return ZM_STATE_CHANGE_ERROR;
+    }
+
+    if (!isUserConnected(id)) {
+        LoggerLogError(g_Logger,
+                "Player with id specified is not connected: %d", id);
+        return ZM_STATE_CHANGE_ERROR;
+    }
+
+    return cure(id, get_param(2), bool:(get_param(3)));
+}
