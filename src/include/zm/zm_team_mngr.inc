@@ -9,7 +9,15 @@
  * FORWARDS
  ******************************************************************************/
 
-//...
+forward zm_onSpawn(const id, const bool: isZombie);
+forward zm_onKilled(const killer, const victim);
+forward zm_onBeforeInfected(const id, const infector, const bool: blockable);
+forward zm_onInfected(const id, const infector);
+forward zm_onAfterInfected(const id, const infector);
+forward zm_onBeforeCured(const id, const curor, const bool: blockable);
+forward zm_onCured(const id, const curor);
+forward zm_onAfterCured(const id, const curor);
+forward zm_onApply(const id, const bool: isZombie);
 
 /*******************************************************************************
  * NATIVES
