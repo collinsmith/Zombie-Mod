@@ -89,6 +89,12 @@ public plugin_precache() {
             .description = "Prints the list of registered extensions",
             .logger = g_Logger);
 
+    zm_registerConCmd(
+            .command = "extensions",
+            .function = "printExtensions",
+            .description = "Prints the list of registered extensions",
+            .logger = g_Logger);
+
     zm_onPrecache();
 }
 
