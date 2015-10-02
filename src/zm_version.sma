@@ -9,6 +9,8 @@
 
 #include "include\\zm\\zombiemod.inc"
 
+#include "include\\stocks\\string_stocks.inc"
+
 static Logger: g_Logger = Invalid_Logger;
 static g_ModName[MOD_NAME_LENGTH+1];
 
@@ -36,7 +38,7 @@ public zm_onExtensionInit() {
 }
 
 configureModName() {
-    assert g_ModName[0] == EOS;
+    assert isStringEmpty(g_ModName);
     LoggerLogDebug(g_Logger, "Configuring mod name (FM_GetGameDescription)");
 
     new length = formatex(g_ModName, MOD_NAME_LENGTH,
