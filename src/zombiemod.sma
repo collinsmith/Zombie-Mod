@@ -11,6 +11,7 @@
 #include "include\\zm\\template\\extension_t.inc"
 
 #include "include\\stocks\\path_stocks.inc"
+#include "include\\stocks\\string_stocks.inc"
 #include "include\\stocks\\dynamic_param_stocks.inc"
 
 static Logger: g_Logger = Invalid_Logger;
@@ -225,7 +226,7 @@ public ZM_Extension: zm_registerExtension(pluginId, numParams) {
     new extension[extension_t];
     extension[ext_PluginId] = pluginId;
     get_string(1, extension[ext_Name], ext_Name_length);
-    if (extension[ext_Name][0] == EOS) {
+    if (isStringEmpty(extension[ext_Name])) {
 #if defined USE_PLUGIN_NAME_FOR_EXTENSION_NAME
         get_plugin(
                 .index = pluginId,
