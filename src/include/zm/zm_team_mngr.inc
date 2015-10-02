@@ -3,6 +3,8 @@
 #endif
 #define _zm_team_mngr_included
 
+#pragma reqlib zm_team_mngr
+
 #include "include\\zm\\zm_team_mngr_const.inc"
 
 /*******************************************************************************
