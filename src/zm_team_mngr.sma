@@ -404,12 +404,12 @@ public printPlayers(id) {
     console_print(id, "Players:");
 
     console_print(id,
-        "%3s %8s %5s %5s %s",
-        "ID",
-        "NAME",
-        "STATE",
-        "ALIVE",
-        "CONNECTED");
+            "%3s %8s %5s %5s %s",
+            "ID",
+            "NAME",
+            "STATE",
+            "ALIVE",
+            "CONNECTED");
 
     new name[32];
     new playersConnected = 0;
@@ -441,10 +441,10 @@ public printZombies(id) {
     console_print(id, "Zombies:");
 
     console_print(id,
-        "%3s %8s %5s",
-        "ID",
-        "NAME",
-        "ALIVE");
+            "%3s %8s %5s",
+            "ID",
+            "NAME",
+            "ALIVE");
 
     new name[32];
     new numZombies = 0;
@@ -469,10 +469,10 @@ public printHumans(id) {
     console_print(id, "Humans:");
 
     console_print(id,
-        "%3s %8s %5s",
-        "ID",
-        "NAME",
-        "ALIVE");
+            "%3s %8s %5s",
+            "ID",
+            "NAME",
+            "ALIVE");
 
     new name[32];
     new numHumans = 0;
