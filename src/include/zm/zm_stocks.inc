@@ -18,7 +18,7 @@
  * @param description Brief description of the purpose for the command
  * @param logger      Logger to log when the command has been registered
  */
-stock zm_registerConCmd(const command[], const function[], const description[], const access = ADMIN_CFG, const Logger: logger = Invalid_Logger) {
+stock zm_registerConCmd(const command[], const function[], const description[], const access = ADMIN_CFG, const Logger: logger = Logger:(0)) {
     new temp[32];
     new cmd[16];
     formatex(cmd, charsmax(cmd), "%L", LANG_SERVER, ZM_NAME_SHORT);
@@ -30,7 +30,7 @@ stock zm_registerConCmd(const command[], const function[], const description[], 
             access,
             description);
 
-    if (logger != Invalid_Logger) {
+    if (logger != Logger:(0)) {
         LoggerLogDebug2(logger, true, "register_concmd \"%s\"", temp);
     }
 }
