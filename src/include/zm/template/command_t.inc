@@ -8,11 +8,6 @@
  ******************************************************************************/
 
 /**
- * Defines the maximum length for the name field of a command
- */
-#define command_Name_length 31
-
-/**
  * Defines the maximum length for the description field of a command
  */
 #define command_Desc_length 63
@@ -31,24 +26,9 @@ enum ZM_Command {
 
 enum command_t {
     /**
-     * Name of this command
-     */
-    command_Name[command_Name_length+1],
-    
-    /**
      * Description of this command
      */
     command_Desc[command_Desc_length+1],
-    
-    /**
-     * Plugin index which owns the handle to be called
-     */
-    command_PluginID,
-    
-    /**
-     * Function index of the handle to be called
-     */
-    command_FuncID,
     
     /**
      * Flags for activation
@@ -59,4 +39,19 @@ enum command_t {
      * Admin flags needed
      */
     command_AdminFlags,
+
+    /**
+     * Plugin index which owns the function to be called
+     */
+    command_PluginID,
+    
+    /**
+     * Function index to be called
+     */
+    command_FuncID,
+
+    /**
+     * List of aliases for this command
+     */
+    Array: command_Aliases,
 };
