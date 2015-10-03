@@ -3,6 +3,8 @@
 #endif
 #define _zm_stocks_included
 
+#include "include\\stocks\\misc_stocks.inc"
+
 /*******************************************************************************
  * STOCKS
  ******************************************************************************/
@@ -18,21 +20,16 @@
  * @param description Brief description of the purpose for the command
  * @param logger      Logger to log when the command has been registered
  */
-stock zm_registerConCmd(const command[], const function[], const description[], const access = ADMIN_CFG, const Logger: logger = Logger:(0)) {
+stock zm_registerConCmd(
+        const command[],
+        const function[],
+        const description[],
+        const access = ADMIN_CFG,
+        const Logger: logger = Logger:(0)) {
     new temp[32];
-    new cmd[16];
-    formatex(cmd, charsmax(cmd), "%L", LANG_SERVER, ZM_NAME_SHORT);
-    strtolower(cmd);
-    formatex(temp, charsmax(temp), "%s.%s", cmd, command);
-    register_concmd(
-            temp,
-            function,
-            access,
-            description);
-
-    if (logger != Logger:(0)) {
-        LoggerLogDebug2(logger, true, "register_concmd \"%s\"", temp);
-    }
+    formatex(temp, charsmax(temp), "%L", LANG_SERVER, ZM_NAME_SHORT);
+    strtolower(temp);
+    registerConCmd(temp, command, function, description, access, logger);
 }
 
 /**
