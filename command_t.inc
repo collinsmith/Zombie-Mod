@@ -4,13 +4,8 @@
 #define _command_t_included
 
 /*******************************************************************************
- * command_t template
+ * Command Tag Definition
  ******************************************************************************/
-
-/**
- * Defines the maximum length for the description field of a command
- */
-#define command_Desc_length 63
 
 /**
  * Definition to permit the Cmd tag in place of the Command tag.
@@ -23,6 +18,15 @@
 enum Command {
     Invalid_Command
 };
+
+/*******************************************************************************
+ * command_t template
+ ******************************************************************************/
+
+/**
+ * Defines the maximum length for the description field of a command
+ */
+#define command_Desc_length 63
 
 enum command_t {
     /**
