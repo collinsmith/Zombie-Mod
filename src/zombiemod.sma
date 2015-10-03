@@ -34,9 +34,9 @@ enum Forwards {
 public plugin_natives() {
     register_library("zombiemod");
 
-    register_native("zm_registerExtension", "zm_registerExtension", 0);
-    register_native("zm_getExtension", "zm_getExtension", 0);
-    register_native("zm_getNumExtensions", "zm_getNumExtensions", 0);
+    register_native("zm_registerExtension", "_registerExtension", 0);
+    register_native("zm_getExtension", "_getExtension", 0);
+    register_native("zm_getNumExtensions", "_getNumExtensions", 0);
 }
 
 public plugin_precache() {
@@ -204,7 +204,7 @@ public printExtensions(id) {
 //         const name[] = NULL_STRING,
 //         const version[] = NULL_STRING,
 //         const description[] = NULL_STRING);
-public ZM_Extension: zm_registerExtension(pluginId, numParams) {
+public ZM_Extension: _registerExtension(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 3, numParams)) {
         return Invalid_Extension;
     }
@@ -280,7 +280,7 @@ public ZM_Extension: zm_registerExtension(pluginId, numParams) {
 }
 
 // native zm_getExtension(ZM_Extension: extId, extension[extension_t]);
-public zm_getExtension(pluginId, numParams) {
+public _getExtension(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 2, numParams)) {
         return;
     }
@@ -303,7 +303,7 @@ public zm_getExtension(pluginId, numParams) {
 }
 
 // native zm_getNumExtensions();
-public zm_getNumExtensions(pluginId, numParams) {
+public _getNumExtensions(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return -1;
     }
