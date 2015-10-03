@@ -3,6 +3,7 @@
 #define MAX_NUM_PREFIXES 8
 #define INITIAL_COMMANDS_SIZE 8
 #define INITIAL_ALIASES_SIZE 16
+#define COMMAND_MANAGER_TXT "command_manager.txt"
 
 #include <amxmodx>
 #include <logger>
@@ -14,6 +15,7 @@
 #include "include\\stocks\\dynamic_param_stocks.inc"
 #include "include\\stocks\\flag_stocks.inc"
 #include "include\\stocks\\misc_stocks.inc"
+#include "include\\stocks\\path_stocks.inc"
 
 stock Command: toCommand(value)                    return Command:(value);
 stock Command: operator= (value)                   return toCommand(value);
@@ -91,6 +93,11 @@ public plugin_init() {
             buildId,
             FCVAR_SPONLY,
             "Current version of Command Manager being used");
+
+    new dictionary[32];
+    getPath(dictionary, _, COMMAND_MANAGER_TXT);
+    register_dictionary(dictionary);
+    LoggerLogDebug(g_Logger, "Registering dictionary file \"%s\"", dictionary);
 
     registerConCmds();
 
