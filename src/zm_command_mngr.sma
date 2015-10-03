@@ -4,6 +4,7 @@
 #define INITIAL_COMMANDS_SIZE 8
 #define INITIAL_ALIASES_SIZE 16
 #define command_Prefix_length 1
+#define ZM_COMMAND_MNGR_TXT "zm_command_mngr.txt"
 
 #include <amxmodx>
 #include <logger>
@@ -79,6 +80,11 @@ public zm_onInit() {
     LoggerSetVerbosity(g_Logger, Severity_Lowest);
     LoggerSetVerbosity(All_Loggers, Severity_Lowest);
 #endif
+
+    new dictionary[32];
+    getPath(dictionary, _, ZM_COMMAND_MNGR_TXT);
+    register_dictionary(dictionary);
+    LoggerLogDebug(g_Logger, "Registering dictionary file \"%s\"", dictionary);
 }
 
 public zm_onExtensionInit() {
