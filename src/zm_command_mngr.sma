@@ -466,7 +466,7 @@ unbindAlias(ZM_Alias: alias) {
     // Don't have to set g_commandsList again, as we modified an Array: element
     g_tempAlias[alias_Command] = Invalid_Command;
     ArraySetArray(g_aliasesList, aliasToIndex(alias), g_tempAlias);
-    assert foundAlias;
+    
     LoggerLogDebug(g_Logger, "Unbound alias %d", alias);
 }
 
