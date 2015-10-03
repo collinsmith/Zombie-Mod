@@ -6,6 +6,7 @@
 #define COMMAND_MANAGER_TXT "command_manager.txt"
 
 #include <amxmodx>
+#include <amxmisc>
 #include <logger>
 
 #include "include\\commandmanager\\alias_t.inc"
@@ -15,6 +16,7 @@
 #include "include\\stocks\\dynamic_param_stocks.inc"
 #include "include\\stocks\\flag_stocks.inc"
 #include "include\\stocks\\misc_stocks.inc"
+#include "include\\stocks\\param_test_stocks.inc"
 #include "include\\stocks\\path_stocks.inc"
 
 stock Command: toCommand(value)                    return Command:(value);
@@ -58,6 +60,8 @@ static g_tempAlias[alias_t], Alias: g_Alias = Invalid_Alias;
 static Trie: g_aliasesMap;
 static Trie: g_prefixesMap;
 
+static g_szCommandBuffer[192];
+
 static g_pCvar_Prefixes;
 
 public plugin_precache() {
@@ -100,6 +104,7 @@ public plugin_init() {
     LoggerLogDebug(g_Logger, "Registering dictionary file \"%s\"", dictionary);
 
     registerConCmds();
+    createForwards();
 
     g_pCvar_Prefixes = create_cvar(
             "command_prefixes",
@@ -111,6 +116,9 @@ public plugin_init() {
     new prefixes[MAX_NUM_PREFIXES];
     get_pcvar_string(g_pCvar_Prefixes, prefixes, charsmax(prefixes));
     cvar_onPrefixesAltered(g_pCvar_Prefixes, NULL_STRING, prefixes);
+
+    register_clcmd("say", "clcmd_onSay");
+    register_clcmd("say_team", "clcmd_onSayTeam");
 }
 
 stock getBuildId(buildId[], len = sizeof buildId) {
@@ -153,6 +161,33 @@ registerConCmds() {
             .logger = g_Logger);
 }
 
+createForwards() {
+    createOnBeforeCommand();
+    createOnCommand();
+}
+
+createOnBeforeCommand() {
+    LoggerLogDebug(g_Logger, "Creating forward cmd_onBeforeCommand");
+    g_fw[onBeforeCommand] = CreateMultiForward("cmd_onBeforeCommand",
+            ET_CONTINUE,
+            FP_CELL, 
+            FP_CELL);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onBeforeCommand] = %d",
+            g_fw[onBeforeCommand]);
+}
+
+createOnCommand() {
+    LoggerLogDebug(g_Logger, "Creating forward cmd_onCommand");
+    g_fw[onCommand] = CreateMultiForward("cmd_onCommand",
+            ET_IGNORE,
+            FP_CELL, 
+            FP_CELL);
+    LoggerLogDebug(g_Logger,
+            "g_fw[onCommand] = %d",
+            g_fw[onCommand]);
+}
+
 public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
     assert pCvar == g_pCvar_Prefixes;
     if (g_prefixesMap == Invalid_Trie) {
@@ -190,6 +225,176 @@ public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
     }
     
     ExecuteForward(g_fw[onPrefixesChanged], g_fw[fwReturn], oldValue, newValue);
+}
+
+
+
+public clcmd_onSay(id) {
+    read_args(g_szCommandBuffer, charsmax(g_szCommandBuffer));
+    return checkCommandAndHandle(
+            id, false, g_szCommandBuffer, charsmax(g_szCommandBuffer));
+}
+
+public clcmd_onSayTeam(id) {
+    read_args(g_szCommandBuffer, charsmax(g_szCommandBuffer));
+    return checkCommandAndHandle(
+            id, true, g_szCommandBuffer, charsmax(g_szCommandBuffer));
+}
+
+/**
+ * Checks if a command is used with a correct prefix and triggers it.
+ *
+ * @param id          Player index who entered the command
+ * @param teamCommand {@literal true} if it was sent via team only chat,
+ *                        otherwise {@literal false}
+ * @param args        Message args being sent
+ * @return {@literal PLUGIN_CONTINUE} in the event that this was not a command
+ *         or did not use a valid prefix, otherwise {@literal PLUGIN_CONTINUE}
+ *         or {@literal PLUGIN_HANDLED} depending on whether or not the command
+ *         should be hidden or not from the chat area
+ */
+checkCommandAndHandle(
+        const id,
+        const bool: teamCommand,
+        args[],
+        const len) {
+    strtolower(args);
+    remove_quotes(args);
+    
+    new temp[2], prefix;
+    temp[0] = args[0];
+    if (!TrieGetCell(g_prefixesMap, temp, prefix)) {
+        return PLUGIN_CONTINUE;
+    }
+    
+    // This was from the legacy code. I don't think this is neccessary.
+    new alias[alias_String_length+1];
+    argbreak(
+            args[1],
+            alias,
+            charsmax(alias),
+            args,
+            len);
+    
+    new Alias: aliasId;
+    if (TrieGetCell(g_aliasesMap, alias, aliasId)) {
+        loadAlias(aliasId);
+        LoggerLogDebug(g_Logger,
+                "Alias found: %d (\"%s\") is bound to command %d",
+                aliasId,
+                g_tempAlias[alias_String],
+                g_tempAlias[alias_Command]);
+        return tryExecutingCommand(
+                prefix,
+                g_tempAlias[alias_Command],
+                id,
+                teamCommand,
+                args,
+                len);
+    }
+    
+    return PLUGIN_CONTINUE;
+}
+
+/**
+ * Attemps to execute the given command for a specified player if their current
+ * state meets the criteria that the command definition requires, and the
+ * command is not blocked by another extension.
+ *
+ * @param prefix      Prefix used when executing command
+ * @param command     Command identifier to try and execute
+ * @param id          Player index who is executing the command
+ * @param teamCommand {@literal true} if it was sent via team only chat,
+ *                        otherwise {@literal false}
+ * @param args        Additional arguments passed with the command (e.g.,
+ *                    /kill <player>, where the value of <player> would be
+ *                    this parameter)
+ * @param len         Max number of bytes in {@param args}, i.e., {@code sizeof
+ *                        {@param args} - 1}
+ */
+tryExecutingCommand(
+        const prefix,
+        const Command: command,
+        const id,
+        const bool: teamCommand,
+        args[],
+        const len) {
+    assert isValidCommand(command);
+    assert isValidId(id);
+    
+    loadCommand(command);
+    
+    new const flags = g_tempCommand[command_Flags];
+    if (!isFlagSet(flags, FLAG_METHOD_SAY)
+            && !isFlagSet(flags, FLAG_METHOD_SAY_TEAM)) {
+        return PLUGIN_CONTINUE;
+    } else if (isFlagSet(flags, FLAG_METHOD_SAY_TEAM) && !teamCommand
+            && !isFlagSet(flags, FLAG_METHOD_SAY)) {
+        zm_printColor(id, "%L", id, "COMMAND_SAYTEAM_ONLY");
+        return PLUGIN_HANDLED;
+    } else if (isFlagSet(flags, FLAG_METHOD_SAY) && teamCommand
+            && !isFlagSet(flags, FLAG_METHOD_SAY_TEAM)) {
+        zm_printColor(id, "%L", id, "COMMAND_SAYALL_ONLY");
+        return PLUGIN_HANDLED;
+    }
+
+    /*new const bool: isZombie = zm_isUserZombie(id);
+    if (!isFlagSet(flags, IS_ZOMBIE) && !isFlagSet(flags, IS_HUMAN)) {
+        return PLUGIN_CONTINUE;
+    } else if (isFlagSet(flags, IS_HUMAN) && isZombie
+            && !isFlagSet(flags, IS_ZOMBIE)) {
+        zm_printColor(id, "%L", id, "COMMAND_CT_ONLY");
+        return PLUGIN_HANDLED;
+    } else if (isFlagSet(flags, IS_ZOMBIE) && !isZombie
+            && !isFlagSet(flags, IS_HUMAN)) {
+        zm_printColor(id, "%L", id, "COMMAND_T_ONLY");
+        return PLUGIN_HANDLED;
+    }*/
+
+    new const bool: isAlive = bool:(is_user_alive(id));
+    if (!isFlagSet(flags, FLAG_STATE_ALIVE)
+            && !isFlagSet(flags, FLAG_STATE_DEAD)) {
+        return PLUGIN_CONTINUE;
+    } else if (isFlagSet(flags, FLAG_STATE_DEAD) && isAlive
+            && !isFlagSet(flags, FLAG_STATE_ALIVE)) {
+        zm_printColor(id, "%L", id, "COMMAND_DEAD_ONLY");
+        return PLUGIN_HANDLED;
+    } else if (isFlagSet(flags, FLAG_STATE_ALIVE) && !isAlive
+            && !isFlagSet(flags, FLAG_STATE_DEAD)) {
+        zm_printColor(id, "%L", id, "COMMAND_ALIVE_ONLY");
+        return PLUGIN_HANDLED;
+    }
+    
+    new const adminFlags = g_tempCommand[command_AdminFlags];
+    if (!access(id, adminFlags)) {
+        zm_printColor(id, "%L", id, "COMMAND_ADMINFLAGS");
+        return PLUGIN_HANDLED;
+    }
+
+    ExecuteForward(g_fw[onBeforeCommand], g_fw[fwReturn], id, prefix, command);
+    if (g_fw[fwReturn] == PLUGIN_HANDLED) {
+        zm_printColor(id, "%L", id, "COMMAND_BLOCKED");
+        return PLUGIN_HANDLED;
+    }
+    
+    trim(args);
+    new name[32];
+    argbreak(
+            args[1],
+            name,
+            charsmax(name),
+            args,
+            len);
+
+    new const player = cmd_target(id, name, CMDTARGET_ALLOW_SELF);
+    callfunc_begin_i(g_tempCommand[command_FuncID], g_tempCommand[command_PluginID]); {
+        callfunc_push_int(id);
+        callfunc_push_int(player);
+        callfunc_push_str(args, false);
+    } callfunc_end();
+    
+    ExecuteForward(g_fw[onCommand], g_fw[fwReturn], id, prefix, command);
+    return PLUGIN_HANDLED;
 }
 
 stock bool: isValidCommand({any,Command}: command) {
