@@ -9,6 +9,9 @@
 #tryinclude <command_t>
 #tryinclude "include\\commandmanager-inc\\command_t.inc"
 
+#tryinclude <command_manager_const>
+#tryinclude "include\\commandmanager-inc\\command_manager_const.inc"
+
 /*******************************************************************************
  * FORWARDS
  ******************************************************************************/
