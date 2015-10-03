@@ -7,6 +7,7 @@
 
 #include <amxmodx>
 #include <amxmisc>
+#include <cstrike>
 #include <logger>
 
 #include "include\\commandmanager\\alias_t.inc"
@@ -43,13 +44,14 @@ static Logger: g_Logger = Invalid_Logger;
 
 enum Forwards {
     fwReturn = 0,
+    onHandleCommand,
     onBeforeCommand,
     onCommand,
     onCommandRegistered,
     onPrefixesChanged,
     onRegisterCommands
 }; static g_fw[Forwards] = { 0, INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE,
-        INVALID_HANDLE, INVALID_HANDLE };
+        INVALID_HANDLE, INVALID_HANDLE, INVALID_HANDLE };
 
 static Array: g_commandsList, g_numCommands;
 static g_tempCommand[command_t], Command: g_Command = Invalid_Command;
@@ -61,6 +63,7 @@ static Trie: g_aliasesMap;
 static Trie: g_prefixesMap;
 
 static g_szCommandBuffer[192];
+static g_szHandlerError[192];
 
 static g_pCvar_Prefixes;
 
@@ -74,6 +77,9 @@ public plugin_precache() {
 
 public plugin_natives() {
     register_library("command_manager");
+
+    register_native("cmd_setHandler", "_setHandler", 0);
+    register_native("cmd_setHandlerError", "_setHandlerError", 0);
 
     register_native("cmd_registerCommand", "_registerCommand", 0);
     register_native("cmd_registerAlias", "_registerAlias", 0);
@@ -316,7 +322,7 @@ tryExecutingCommand(
         const prefix,
         const Command: command,
         const id,
-        const bool: teamCommand,
+        const bool: isTeamCommand,
         args[],
         const len) {
     assert isValidCommand(command);
@@ -324,18 +330,24 @@ tryExecutingCommand(
     
     loadCommand(command);
     
+    g_szHandlerError[0] = EOS;
     new const flags = g_tempCommand[command_Flags];
+    new const bool: isAlive = bool:(is_user_alive(id));
+    new const CsTeams: team = cs_get_user_team(id);
+    new const bool: hasAccess
+            = bool:(access(id, g_tempCommand[command_AdminFlags]));
+
+#define HANDLE_COMMAND(%1)\
+    handleCommand(%1,flags,isTeamCommand,isAlive,team,hasAccess)
     if (!isFlagSet(flags, FLAG_METHOD_SAY)
             && !isFlagSet(flags, FLAG_METHOD_SAY_TEAM)) {
         return PLUGIN_CONTINUE;
-    } else if (isFlagSet(flags, FLAG_METHOD_SAY_TEAM) && !teamCommand
+    } else if (isFlagSet(flags, FLAG_METHOD_SAY_TEAM) && !isTeamCommand
             && !isFlagSet(flags, FLAG_METHOD_SAY)) {
-        zm_printColor(id, "%L", id, "COMMAND_SAYTEAM_ONLY");
-        return PLUGIN_HANDLED;
-    } else if (isFlagSet(flags, FLAG_METHOD_SAY) && teamCommand
+        return HANDLE_COMMAND(g_fw[fwReturn]);
+    } else if (isFlagSet(flags, FLAG_METHOD_SAY) && isTeamCommand
             && !isFlagSet(flags, FLAG_METHOD_SAY_TEAM)) {
-        zm_printColor(id, "%L", id, "COMMAND_SAYALL_ONLY");
-        return PLUGIN_HANDLED;
+        return HANDLE_COMMAND(g_fw[fwReturn]);
     }
 
     /*new const bool: isZombie = zm_isUserZombie(id);
@@ -343,37 +355,31 @@ tryExecutingCommand(
         return PLUGIN_CONTINUE;
     } else if (isFlagSet(flags, IS_HUMAN) && isZombie
             && !isFlagSet(flags, IS_ZOMBIE)) {
-        zm_printColor(id, "%L", id, "COMMAND_CT_ONLY");
-        return PLUGIN_HANDLED;
+        return HANDLE_COMMAND(g_fw[fwReturn]);
     } else if (isFlagSet(flags, IS_ZOMBIE) && !isZombie
             && !isFlagSet(flags, IS_HUMAN)) {
-        zm_printColor(id, "%L", id, "COMMAND_T_ONLY");
-        return PLUGIN_HANDLED;
+        return HANDLE_COMMAND(g_fw[fwReturn]);
     }*/
 
-    new const bool: isAlive = bool:(is_user_alive(id));
     if (!isFlagSet(flags, FLAG_STATE_ALIVE)
             && !isFlagSet(flags, FLAG_STATE_DEAD)) {
         return PLUGIN_CONTINUE;
     } else if (isFlagSet(flags, FLAG_STATE_DEAD) && isAlive
             && !isFlagSet(flags, FLAG_STATE_ALIVE)) {
-        zm_printColor(id, "%L", id, "COMMAND_DEAD_ONLY");
-        return PLUGIN_HANDLED;
+        return HANDLE_COMMAND(g_fw[fwReturn]);
     } else if (isFlagSet(flags, FLAG_STATE_ALIVE) && !isAlive
             && !isFlagSet(flags, FLAG_STATE_DEAD)) {
-        zm_printColor(id, "%L", id, "COMMAND_ALIVE_ONLY");
-        return PLUGIN_HANDLED;
+        return HANDLE_COMMAND(g_fw[fwReturn]);
     }
     
-    new const adminFlags = g_tempCommand[command_AdminFlags];
-    if (!access(id, adminFlags)) {
-        zm_printColor(id, "%L", id, "COMMAND_ADMINFLAGS");
-        return PLUGIN_HANDLED;
+    
+    if (!hasAccess) {
+        return HANDLE_COMMAND(g_fw[fwReturn]);
     }
 
     ExecuteForward(g_fw[onBeforeCommand], g_fw[fwReturn], id, prefix, command);
     if (g_fw[fwReturn] == PLUGIN_HANDLED) {
-        zm_printColor(id, "%L", id, "COMMAND_BLOCKED");
+        HANDLE_COMMAND(g_fw[fwReturn]);
         return PLUGIN_HANDLED;
     }
     
@@ -395,6 +401,27 @@ tryExecutingCommand(
     
     ExecuteForward(g_fw[onCommand], g_fw[fwReturn], id, prefix, command);
     return PLUGIN_HANDLED;
+}
+
+handleCommand(
+        &ret,
+        const flags,
+        const bool: isTeamCommand,
+        const bool: isAlive,
+        const CsTeams: team,
+        const bool: hasAccess) {
+    if (g_fw[onHandleCommand] == INVALID_HANDLE) {
+        return PLUGIN_CONTINUE;
+    }
+
+    ExecuteForward(g_fw[onHandleCommand], ret,
+            g_szHandlerError,
+            flags,
+            isTeamCommand,
+            isAlive,
+            team,
+            hasAccess);
+    return ret;
 }
 
 stock bool: isValidCommand({any,Command}: command) {
@@ -694,6 +721,53 @@ public printAliases(id) {
 /*******************************************************************************
  * Natives
  ******************************************************************************/
+
+public _setHandler(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 1, numParams)) {
+        return INVALID_HANDLE;
+    }
+
+    new handle[32];
+    get_string(1, handle, charsmax(handle));
+    LoggerLogDebug(g_Logger,
+            "Creating onCommandHandled forward in plugin %d::%s",
+            pluginId,
+            handle);
+
+    new fwd = CreateOneForward(pluginId, handle,
+            FP_STRING,
+            FP_CELL,
+            FP_CELL,
+            FP_CELL,
+            FP_CELL,
+            FP_CELL);
+
+    if (fwd == INVALID_HANDLE) {
+        LoggerLogDebug(g_Logger, "Failed to create onCommandHandled forward");
+        return INVALID_HANDLE;
+    }
+
+    if (g_fw[onHandleCommand] != INVALID_HANDLE) {
+        LoggerLogDebug(g_Logger,
+                "Destroying existing onCommandHandled forward");
+        DestroyForward(g_fw[onHandleCommand]);
+    }
+
+    LoggerLogDebug(g_Logger, "Setting g_fw[onHandleCommand]=%d", fwd);
+    g_fw[onHandleCommand] = fwd;
+    return fwd;
+}
+
+public _setHandlerError(pluginId, numParams) {
+    if (!numParamsEqual(g_Logger, 1, numParams)) {
+        return;
+    }
+
+    get_string(1, g_szHandlerError, charsmax(g_szHandlerError));
+    LoggerLogDebug(g_Logger,
+            "Handler error string set to \"%s\"",
+            g_szHandlerError);
+}
 
 // native Command: cmd_registerCommand(
 //         const alias[],
