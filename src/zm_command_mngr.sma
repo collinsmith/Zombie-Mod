@@ -3,6 +3,7 @@
 #define ZM_PLAYERS_PRINT_EMPTY
 #define INITIAL_COMMANDS_SIZE 8
 #define INITIAL_ALIASES_SIZE 16
+#define command_Prefix_length 1
 
 #include <amxmodx>
 #include <logger>
@@ -13,6 +14,7 @@
 #include "include\\zm\\template\\command_t.inc"
 
 #include "include\\stocks\\flag_stocks.inc"
+#include "include\\stocks\\param_test_stocks.inc"
 #include "include\\stocks\\string_stocks.inc"
 #include "include\\stocks\\dynamic_param_stocks.inc"
 
@@ -56,6 +58,8 @@ static g_tempAlias[alias_t];
 static Trie:g_prefixesMap;
 
 static g_pCvar_Prefixes;
+
+static g_szBuffer[command_Prefix_length+alias_Alias_length+1];
 
 public plugin_natives() {
     register_library("zm_command_mngr");
@@ -102,6 +106,9 @@ public zm_onExtensionInit() {
     new prefixes[8];
     get_pcvar_string(g_pCvar_Prefixes, prefixes, charsmax(prefixes));
     cvar_onPrefixesAltered(g_pCvar_Prefixes, NULL_STRING, prefixes);
+
+    register_clcmd("say", "clcmd_onSay");
+    register_clcmd("say_team", "clcmd_onSayTeam");
 }
 
 registerConCmds() {
@@ -189,6 +196,156 @@ public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
     }
     
     ExecuteForward(g_fw[onPrefixesChanged], g_fw[fwReturn], oldValue, newValue);
+}
+
+public clcmd_onSay(id) {
+    read_args(g_szBuffer, charsmax(g_szBuffer));
+    return checkCommandAndHandle(id, false, g_szBuffer);
+}
+
+public clcmd_onSayTeam(id) {
+    read_args(g_szBuffer, charsmax(g_szBuffer));
+    return checkCommandAndHandle(id, true, g_szBuffer);
+}
+
+/**
+ * Checks if a command is used with a correct prefix and triggers it.
+ *
+ * @param id          Player index who entered the command
+ * @param teamCommand {@literal true} if it was sent via team only chat,
+ *                        otherwise {@literal false}
+ * @param args        Message args being sent
+ * @return {@literal PLUGIN_CONTINUE} in the event that this was not a command
+ *         or did not use a valid prefix, otherwise {@literal PLUGIN_CONTINUE}
+ *         or {@literal PLUGIN_HANDLED} depending on whether or not the command
+ *         should be hidden or not from the chat area
+ */
+checkCommandAndHandle(
+        const id,
+        const bool: teamCommand,
+        args[]) {
+    strtolower(args);
+    remove_quotes(args);
+    
+    new temp[2], prefix;
+    temp[0] = args[0];
+    if (!TrieGetCell(g_prefixesMap, temp, prefix)) {
+        return PLUGIN_CONTINUE;
+    }
+    
+    // This was from the legacy code. I don't think this is neccessary.
+    argbreak(
+            args[1],
+            g_tempAlias[alias_Alias],
+            alias_Alias_length,
+            args,
+            charsmax(g_szBuffer));
+    
+    new ZM_Alias: alias;
+    if (TrieGetCell(
+            g_aliasesMap,
+            g_tempAlias[alias_Alias],
+            alias)) {
+        ArrayGetArray(g_aliasesList, aliasToIndex(alias), g_tempAlias);
+        LoggerLogDebug(g_Logger,
+                "Checking alias \"%s\" (%d) = command %d",
+                g_tempAlias[alias_Alias],
+                alias,
+                g_tempAlias[alias_Command]);
+        return tryExecutingCommand(
+                g_tempAlias[alias_Command],
+                id,
+                teamCommand,
+                args);
+    }
+    
+    return PLUGIN_CONTINUE;
+}
+
+/**
+ * Attemps to execute the given command for a specified player if their current
+ * state meets the criteria that the command definition requires, and the
+ * command is not blocked by another extension.
+ *
+ * @param command     Command identifier to try and execute
+ * @param id          Player index who is executing the command
+ * @param teamCommand {@literal true} if it was sent via team only chat,
+ *                        otherwise {@literal false}
+ * @param args        Additional arguments passed with the command (e.g.,
+ *                    /kill <player>, where the value of <player> would be
+ *                    this parameter)
+ */
+tryExecutingCommand(
+        const ZM_Command: command,
+        const id,
+        const bool: teamCommand,
+        args[]) {
+    assert isValidCommand(command);
+    assert isValidId(id);
+    
+    ArrayGetArray(g_commandsList, commandToIndex(command), g_tempCommand);
+    
+    new flags = g_tempCommand[command_Flags];
+    if (!isFlagSet(flags, IS_SAY_ALL) && !isFlagSet(flags, IS_SAY_TEAM)) {
+        return PLUGIN_CONTINUE;
+    } else if (isFlagSet(flags, IS_SAY_TEAM) && !teamCommand
+            && !isFlagSet(flags, IS_SAY_ALL)) {
+        zm_printColor(id, "%L", id, "COMMAND_SAYTEAMONLY");
+        return PLUGIN_HANDLED;
+    } else if (isFlagSet(flags, IS_SAY_ALL) && teamCommand
+            && !isFlagSet(flags, IS_SAY_TEAM)) {
+        zm_printColor(id, "%L", id, "COMMAND_SAYALLONLY");
+        return PLUGIN_HANDLED;
+    }
+
+    new isZombie = zm_isUserZombie(id);
+    if (!isFlagSet(flags, IS_ZOMBIE) && !isFlagSet(flags, IS_HUMAN)) {
+        return PLUGIN_CONTINUE;
+    } else if (isFlagSet(flags, IS_HUMAN) && isZombie
+            && !isFlagSet(flags, IS_ZOMBIE)) {
+        zm_printColor(id, "%L", id, "COMMAND_HUMANONLY");
+        return PLUGIN_HANDLED;
+    } else if (isFlagSet(flags, IS_ZOMBIE) && !isZombie
+            && !isFlagSet(flags, IS_HUMAN)) {
+        zm_printColor(id, "%L", id, "COMMAND_ZOMBIEONLY");
+        return PLUGIN_HANDLED;
+    }
+
+    new isAlive = zm_isUserAlive(id);
+    if (!isFlagSet(flags, IS_ALIVE) && !isFlagSet(flags, IS_DEAD)) {
+        return PLUGIN_CONTINUE;
+    } else if (isFlagSet(flags, IS_DEAD) && isAlive
+            && !isFlagSet(flags, IS_ALIVE)) {
+        zm_printColor(id, "%L", id, "COMMAND_DEADONLY");
+        return PLUGIN_HANDLED;
+    } else if (isFlagSet(flags, IS_ALIVE) && !isAlive
+            && !isFlagSet(flags, IS_DEAD)) {
+        zm_printColor(id, "%L", id, "COMMAND_ALIVEONLY");
+        return PLUGIN_HANDLED;
+    }
+    
+    new iAdminFlags = g_tempCommand[command_AdminFlags];
+    if (!access(id, iAdminFlags)) {
+        zm_printColor(id, "%L", id, "COMMAND_ADMINFLAGS");
+        return PLUGIN_HANDLED;
+    }
+
+    ExecuteForward(g_fw[onBeforeCommand], g_fw[fwReturn], id, command);
+    if (g_fw[fwReturn] == PLUGIN_HANDLED) {
+        zm_printColor(id, "%L", id, "COMMAND_BLOCKED");
+        return PLUGIN_HANDLED;
+    }
+    
+    trim(args);
+    new player = cmd_target(id, args, CMDTARGET_ALLOW_SELF);
+    callfunc_begin_i(g_tempCommand[command_FuncID], g_tempCommand[command_PluginID]); {
+        callfunc_push_int(id);
+        callfunc_push_int(player);
+        callfunc_push_str(args, false);
+    } callfunc_end();
+    
+    ExecuteForward(g_fw[onCommand], g_fw[fwReturn], id, command);
+    return PLUGIN_HANDLED;
 }
 
 bool: isValidCommand(ZM_Command: command) {
@@ -329,6 +486,7 @@ ZM_Alias: registerAlias(
                 "Alias already mapped (alias=%d), remapping to command %d",
                 aliasId,
                 command);
+        LoggerLogDebug(g_Logger, "g_numAliases=%d; alias \"%s\"", g_numAliases, alias);
         bindAlias(aliasId, command);
         return aliasId;
     }
@@ -540,9 +698,10 @@ public ZM_Command: _registerCommand(pluginId, numParams) {
 
     new flags[Flags+1];
     get_string(3, flags, charsmax(flags));
+    new bits = readCustomFlags(flags);
     
     new command[command_t];
-    command[command_Flags] = readCustomFlags(flags);
+    command[command_Flags] = bits;
     get_string(4, command[command_Desc], command_Desc_length);
     command[command_AdminFlags] = get_param(5);
     command[command_PluginID] = pluginId;
@@ -564,6 +723,40 @@ public ZM_Command: _registerCommand(pluginId, numParams) {
     if (aliasId == Invalid_Alias) {
         LoggerLogWarn(g_Logger,
                 "Command %d registered without an alias!", cmdId);
+    }
+
+    if (!isFlagSet(bits, IS_SAY_ALL) && !isFlagSet(bits, IS_SAY_TEAM)) {
+        LoggerLogWarn(g_Logger,
+                "Command %d with alias \"%s\" does not have a flag specifying \
+                a say command which activates it (say '%c' and/or \
+                say_team '%c')",
+                cmdId,
+                alias,
+                IS_SAY_ALL_CH,
+                IS_SAY_TEAM_CH);
+    }
+
+    if (!isFlagSet(bits, IS_ALIVE) && !isFlagSet(bits, IS_DEAD)) {
+        LoggerLogWarn(g_Logger,
+                "Command %d with alias \"%s\" does not have a flag specifying \
+                a player state which can activate it (alive '%c' and/or \
+                dead '%c')",
+                cmdId,
+                alias,
+                IS_ALIVE_CH,
+                IS_DEAD_CH);
+    }
+
+    if (!isFlagSet(bits, IS_HUMAN) && !isFlagSet(bits, IS_ZOMBIE)) {
+        LoggerLogWarn(g_Logger,
+                "Command %d with alias \"%s\" does not have a flag specifying \
+                a team which can activate it (%s '%c' and/or %s '%c')",
+                cmdId,
+                alias,
+                HUMAN,
+                IS_HUMAN_CH,
+                ZOMBIE,
+                IS_ZOMBIE_CH);
     }
 
     if (g_fw[onCommandRegistered] == INVALID_HANDLE) {
