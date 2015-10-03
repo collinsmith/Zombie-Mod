@@ -4,6 +4,7 @@
 #define _alias_t_included
 
 #tryinclude <command_t>
+#tryinclude "include\\commandmanager\\command_t.inc"
 #tryinclude "include\\commandmanager-inc\\command_t.inc"
 
 /*******************************************************************************

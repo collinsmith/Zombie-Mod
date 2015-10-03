@@ -4,12 +4,15 @@
 #define _command_manager_included
 
 #tryinclude <alias_t>
+#tryinclude "include\\commandmanager\\alias_t.inc"
 #tryinclude "include\\commandmanager-inc\\alias_t.inc"
 
 #tryinclude <command_t>
+#tryinclude "include\\commandmanager\\command_t.inc"
 #tryinclude "include\\commandmanager-inc\\command_t.inc"
 
 #tryinclude <command_manager_const>
+#tryinclude "include\\commandmanager\\command_manager_const.inc"
 #tryinclude "include\\commandmanager-inc\\command_manager_const.inc"
 
 #pragma reqlib command_manager
