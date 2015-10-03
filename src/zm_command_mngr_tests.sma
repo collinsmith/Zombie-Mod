@@ -32,8 +32,10 @@ public zm_onExtensionInit() {
     zm_getCommandFromAlias("alias3");
 }
 
-public handle1() {
+public handle1(id) {
+    zm_printColor(id, "handle1");
 }
 
-public handle2() {
+public handle2(id) {
+    zm_printColor(id, "handle2");
 }
