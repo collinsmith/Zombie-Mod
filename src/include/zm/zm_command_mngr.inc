@@ -3,6 +3,9 @@
 #endif
 #define _zm_command_mngr_included
 
+#include "include\\zm\\template\\alias_t.inc"
+#include "include\\zm\\template\\command_t.inc"
+
 #pragma reqlib zm_command_mngr
 
 /*******************************************************************************
