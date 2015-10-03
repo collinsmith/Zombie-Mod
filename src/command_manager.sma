@@ -115,9 +115,11 @@ public plugin_init() {
 
 stock getBuildId(buildId[], len = sizeof buildId) {
 #if defined COMPILE_FOR_DEBUG
-    return formatex(buildId, len - 1, "%s [%s] [DEBUG]", VERSION_STRING, __DATE__);
+    return formatex(buildId, len - 1,
+            "%s [%s] [DEBUG]", VERSION_STRING, __DATE__);
 #else
-    return formatex(buildId, len - 1, "%s [%s]", VERSION_STRING, __DATE__);
+    return formatex(buildId, len - 1,
+            "%s [%s]", VERSION_STRING, __DATE__);
 #endif
 }
 
@@ -232,7 +234,8 @@ stock loadCommand(Command: command) {
 stock commitCommand(Command: command) {
     ArrayGetArray(g_commandsList, commandToIndex(command), g_tempCommand);
     g_Command = command;
-    LoggerLogDebug(g_Logger, "Committed command %d into g_tempCommand", g_Command);
+    LoggerLogDebug(g_Logger,
+            "Committed command %d into g_tempCommand", g_Command);
 }
 
 stock invalidateCommand() {
