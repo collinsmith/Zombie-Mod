@@ -34,14 +34,14 @@ static g_flagZombie;
 public plugin_natives() {
     register_library("zm_team_mngr");
 
-    register_native("zm_isUserConnected", "zm_isUserConnected", 0);
-    register_native("zm_isUserAlive", "zm_isUserAlive", 0);
-    register_native("zm_isUserZombie", "zm_isUserZombie", 0);
+    register_native("zm_isUserConnected", "_isUserConnected", 0);
+    register_native("zm_isUserAlive", "_isUserAlive", 0);
+    register_native("zm_isUserZombie", "_isUserZombie", 0);
 
-    register_native("zm_respawn", "zm_respawn", 0);
+    register_native("zm_respawn", "_respawn", 0);
 
-    register_native("zm_infect", "zm_infect", 0);
-    register_native("zm_cure", "zm_cure", 0);
+    register_native("zm_infect", "_infect", 0);
+    register_native("zm_cure", "_cure", 0);
 }
 
 public zm_onExtensionInit() {
@@ -498,7 +498,7 @@ public printHumans(id) {
  ******************************************************************************/
 
 // native bool: zm_isUserConnected(const id);
-public bool: zm_isUserConnected(pluginId, numParams) {
+public bool: _isUserConnected(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return false;
     }
@@ -513,7 +513,7 @@ public bool: zm_isUserConnected(pluginId, numParams) {
 }
 
 // native bool: zm_isUserAlive(const id);
-public bool: zm_isUserAlive(pluginId, numParams) {
+public bool: _isUserAlive(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return false;
     }
@@ -528,7 +528,7 @@ public bool: zm_isUserAlive(pluginId, numParams) {
 }
 
 // native bool: zm_isUserZombie(const id);
-public bool: zm_isUserZombie(pluginId, numParams) {
+public bool: _isUserZombie(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return false;
     }
@@ -543,7 +543,7 @@ public bool: zm_isUserZombie(pluginId, numParams) {
 }
 
 // native bool: zm_respawn(const id, const bool: force = false);
-public bool: zm_respawn(pluginId, numParams) {
+public bool: _respawn(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 2, numParams)) {
         return false;
     }
@@ -567,7 +567,7 @@ public bool: zm_respawn(pluginId, numParams) {
 //         const id,
 //         const infector = -1,
 //         const bool: blockable = true);
-public ZM_State_Change: zm_infect(pluginId, numParams) {
+public ZM_State_Change: _infect(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 3, numParams)) {
         return ZM_STATE_CHANGE_ERROR;
     }
@@ -591,7 +591,7 @@ public ZM_State_Change: zm_infect(pluginId, numParams) {
 //         const id,
 //         const curor = -1,
 //         const bool: blockable = true);
-public ZM_State_Change: zm_cure(pluginId, numParams) {
+public ZM_State_Change: _cure(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 3, numParams)) {
         return ZM_STATE_CHANGE_ERROR;
     }
