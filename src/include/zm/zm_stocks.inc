@@ -34,3 +34,35 @@ stock zm_registerConCmd(const command[], const function[], const description[], 
         LoggerLogDebug2(logger, true, "register_concmd \"%s\"", temp);
     }
 }
+
+/**
+ * Defines the length of the buffer used for printing.
+ */
+#define BUFFER_LENGTH 191
+
+/**
+ * Prints a message to the chat using colorchat.
+ * 
+ * @param id      Player index to send the message to, 0 for all players
+ * @param message Message or message format to print
+ */
+stock zm_printColor(const id, const message[], any: ...) {
+    static buffer[BUFFER_LENGTH+1];
+    static offset;
+    if (buffer[0] == EOS) {
+        offset = formatex(buffer, BUFFER_LENGTH,
+                "[%L] ",
+                LANG_SERVER, ZM_NAME_SHORT);
+    }
+    
+    new length = offset;
+    switch (numargs()) {
+        case 2: length += copy(
+                buffer[offset], BUFFER_LENGTH-offset, message);
+        default: length += vformat(
+                buffer[offset], BUFFER_LENGTH-offset, message, 3);
+    }
+    
+    buffer[length] = EOS;
+    client_print_color(id, print_team_default, buffer);
+}
