@@ -1,13 +1,3 @@
 [en]
 ZM_NAME=Zombie Mod
 ZM_NAME_SHORT=ZM
-COMMANDS=Commands
-COMMAND_PREFIXES=Command Prefixes
-COMMAND_SAYALLONLY=This command only works in all-chat
-COMMAND_SAYTEAMONLY=This command only works in team-chat
-COMMAND_HUMANONLY=Only humans can use this command
-COMMAND_ZOMBIEONLY=Only zombies can use this command
-COMMAND_ALIVEONLY=You cannot use this command while dead
-COMMAND_DEADONLY=This command only works while you're dead
-COMMAND_BLOCKED=You are not allowed to use this command right now
-COMMAND_ADMINFLAGS=You don't have the requires access level for this command
