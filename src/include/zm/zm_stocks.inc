@@ -54,7 +54,7 @@ stock const PRINT_COLOR_HEADER[] = "[\4%L\1] ";
  * 
  * @return Number of bytes copied
  */
-stock const zm_getPrintColorHeader(dst[], len) {
+stock zm_getPrintColorHeader(dst[], len) {
     return copy(dst, len, PRINT_COLOR_HEADER);
 }
 
