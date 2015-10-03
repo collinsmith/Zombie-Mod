@@ -18,6 +18,8 @@
 #define FLAG_TEAM_CT         7
 #define FLAG_TEAM_SPECTATOR  8
 
+#define FLAG_SEPARATOR          ','
+
 #define FLAG_METHOD_SAY_CH      '1'
 #define FLAG_METHOD_SAY_TEAM_CH '2'
 
