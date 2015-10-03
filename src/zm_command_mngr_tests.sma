@@ -18,11 +18,18 @@ public zm_onExtensionInit() {
             .version = VERSION_STRING,
             .description = "Tests customer commands registered in zm_command_mngr");
 
-    new ZM_Command: command = zm_registerCommand("alias1", "handle1", _, "Calls handle1");
-    command = zm_registerCommand("alias1", "handle2", "a", "Calls handle2");
-    command = zm_registerCommand("alias1", "handle1", "ab");
-    command = zm_registerCommand("alias1", "handle1", "abc");
-    command = zm_registerCommand("alias2", "handle2", "abcd");
+    new ZM_Command: command;
+    zm_registerCommand("alias1", "handle1", _, "Calls handle1");
+    zm_registerCommand("alias1", "handle2", "a", "Calls handle2");
+    zm_registerCommand("alias1", "handle1", "ad");
+    command = zm_registerCommand("alias1", "handle1", "ads");
+    zm_registerCommand("alias2", "handle2", "adst");
+    zm_registerCommand("alias2", "handle2", "adsth");
+    zm_registerCommand("alias2", "handle2", "adsthz");
+    zm_registerAlias(command, "alias3");
+    zm_getCommandFromAlias("alias1");
+    zm_getCommandFromAlias("alias2");
+    zm_getCommandFromAlias("alias3");
 }
 
 public handle1() {
