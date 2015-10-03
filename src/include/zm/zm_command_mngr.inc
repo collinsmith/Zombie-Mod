@@ -14,7 +14,7 @@ forward zm_onCommand(const id, const ZM_Command: command);
 
 forward zm_onCommandRegistered(
         const ZM_Command:cmdId,
-        const command[],
+        const alias[],
         const handle[],
         const flags[],
         const description[],
@@ -27,17 +27,17 @@ forward zm_onPrefixesChanged(const oldValue[], const newValue[]);
  ******************************************************************************/
 
 /*
-l - Execute only on say all
-t - Execute only on say_team
-z - Execute only if zombie
-h - Execute only if human
 a - Execute only if alive
 d - Execute only if dead
+s - Execute only on say all
+t - Execute only on say_team
+h - Execute only if human
+z - Execute only if zombie
 */
 native ZM_Command: zm_registerCommand(
         const alias[],
         const handle[],
-        const flags[] = "abcdef",
+        const flags[] = "adsthz",
         const description[] = NULL_STRING,
         const adminFlags = ADMIN_ALL);
 
@@ -45,4 +45,11 @@ native ZM_Alias: zm_registerAlias(
         const ZM_Command: command,
         const alias[]);
 
-native ZM_Command: zm_getCommandByName(const command[]);
+native ZM_Command: zm_getCommandFromAlias(const alias[]);
+
+native bool: zm_isValidCommand(const ZM_Command: command);
+
+native bool: zm_isValidAlias(const ZM_Alias: alias);
+
+native zm_getNumCommands();
+native zm_getNumAliases();
