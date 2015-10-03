@@ -30,7 +30,7 @@ enum alias_t {
     /**
      * Name of this command
      */
-    alias_Alias[alias_String_length+1],
+    alias_String[alias_String_length+1],
 
     /**
      * Command identifier for which this alias belongs
