@@ -488,7 +488,7 @@ public printAliases(id) {
                     i+1,
                     g_tempAlias[alias_Alias],
                     command,
-                    "",
+                    NULL_STRING,
                     -1);
         }
     }
