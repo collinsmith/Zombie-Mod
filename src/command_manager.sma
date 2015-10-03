@@ -3,7 +3,6 @@
 #define MAX_NUM_PREFIXES 8
 #define INITIAL_COMMANDS_SIZE 8
 #define INITIAL_ALIASES_SIZE 16
-#define COMMAND_MANAGER_TXT "command_manager.txt"
 
 #include <amxmodx>
 #include <amxmisc>
@@ -18,7 +17,7 @@
 #include "include\\stocks\\flag_stocks.inc"
 #include "include\\stocks\\misc_stocks.inc"
 #include "include\\stocks\\param_test_stocks.inc"
-#include "include\\stocks\\path_stocks.inc"
+#include "include\\stocks\\string_stocks.inc"
 
 stock Command: toCommand(value)                    return Command:(value);
 stock Command: operator= (value)                   return toCommand(value);
@@ -103,11 +102,6 @@ public plugin_init() {
             buildId,
             FCVAR_SPONLY,
             "Current version of Command Manager being used");
-
-    new dictionary[32];
-    getPath(dictionary, _, COMMAND_MANAGER_TXT);
-    register_dictionary(dictionary);
-    LoggerLogDebug(g_Logger, "Registering dictionary file \"%s\"", dictionary);
 
     registerConCmds();
     createForwards();
@@ -337,49 +331,18 @@ tryExecutingCommand(
     new const bool: hasAccess
             = bool:(access(id, g_tempCommand[command_AdminFlags]));
 
-#define HANDLE_COMMAND(%1)\
-    handleCommand(%1,flags,isTeamCommand,isAlive,team,hasAccess)
-    if (!isFlagSet(flags, FLAG_METHOD_SAY)
-            && !isFlagSet(flags, FLAG_METHOD_SAY_TEAM)) {
-        return PLUGIN_CONTINUE;
-    } else if (isFlagSet(flags, FLAG_METHOD_SAY_TEAM) && !isTeamCommand
-            && !isFlagSet(flags, FLAG_METHOD_SAY)) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
-    } else if (isFlagSet(flags, FLAG_METHOD_SAY) && isTeamCommand
-            && !isFlagSet(flags, FLAG_METHOD_SAY_TEAM)) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
-    }
-
-    /*new const bool: isZombie = zm_isUserZombie(id);
-    if (!isFlagSet(flags, IS_ZOMBIE) && !isFlagSet(flags, IS_HUMAN)) {
-        return PLUGIN_CONTINUE;
-    } else if (isFlagSet(flags, IS_HUMAN) && isZombie
-            && !isFlagSet(flags, IS_ZOMBIE)) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
-    } else if (isFlagSet(flags, IS_ZOMBIE) && !isZombie
-            && !isFlagSet(flags, IS_HUMAN)) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
-    }*/
-
-    if (!isFlagSet(flags, FLAG_STATE_ALIVE)
-            && !isFlagSet(flags, FLAG_STATE_DEAD)) {
-        return PLUGIN_CONTINUE;
-    } else if (isFlagSet(flags, FLAG_STATE_DEAD) && isAlive
-            && !isFlagSet(flags, FLAG_STATE_ALIVE)) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
-    } else if (isFlagSet(flags, FLAG_STATE_ALIVE) && !isAlive
-            && !isFlagSet(flags, FLAG_STATE_DEAD)) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
-    }
-    
-    
-    if (!hasAccess) {
-        return HANDLE_COMMAND(g_fw[fwReturn]);
+    handleCommand(
+            g_fw[fwReturn],
+            id, flags, isTeamCommand, isAlive, team, hasAccess);
+    if (g_fw[fwReturn] == PLUGIN_HANDLED) {
+        return PLUGIN_HANDLED;
     }
 
     ExecuteForward(g_fw[onBeforeCommand], g_fw[fwReturn], id, prefix, command);
     if (g_fw[fwReturn] == PLUGIN_HANDLED) {
-        HANDLE_COMMAND(g_fw[fwReturn]);
+        handleCommand(
+                g_fw[fwReturn],
+                id, flags, isTeamCommand, isAlive, team, hasAccess);
         return PLUGIN_HANDLED;
     }
     
@@ -405,6 +368,7 @@ tryExecutingCommand(
 
 handleCommand(
         &ret,
+        const id,
         const flags,
         const bool: isTeamCommand,
         const bool: isAlive,
@@ -415,6 +379,7 @@ handleCommand(
     }
 
     ExecuteForward(g_fw[onHandleCommand], ret,
+            id,
             g_szHandlerError,
             flags,
             isTeamCommand,
@@ -735,6 +700,7 @@ public _setHandler(pluginId, numParams) {
             handle);
 
     new fwd = CreateOneForward(pluginId, handle,
+            FP_CELL,
             FP_STRING,
             FP_CELL,
             FP_CELL,
