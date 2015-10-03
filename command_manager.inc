@@ -12,6 +12,8 @@
 #tryinclude <command_manager_const>
 #tryinclude "include\\commandmanager-inc\\command_manager_const.inc"
 
+#pragma reqlib command_manager
+
 /*******************************************************************************
  * FORWARDS
  ******************************************************************************/
