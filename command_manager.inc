@@ -38,7 +38,6 @@ forward cmd_onPrefixesChanged(const oldValue[], const newValue[]);
  * NATIVES
  ******************************************************************************/
 
-native cmd_setHandler(const function[]);
 native cmd_setHandlerError(const error[]);
 
 /*
