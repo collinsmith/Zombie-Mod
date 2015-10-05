@@ -110,8 +110,8 @@ stock CsTeams: getTeamForFlag(const flag) {
     return CS_TEAM_UNASSIGNED;
 }
 
-stock getFlagForTeam(const flag) {
-    switch (flag) {
+stock getFlagForTeam(const CsTeams: team) {
+    switch (team) {
         case CS_TEAM_UNASSIGNED: return FLAG_TEAM_UNASSIGNED;
         case CS_TEAM_T:          return FLAG_TEAM_T;
         case CS_TEAM_CT:         return FLAG_TEAM_CT;
