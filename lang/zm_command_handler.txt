@@ -1,11 +1,17 @@
 [en]
-COMMANDS=Commands
-COMMAND_PREFIXES=Command Prefixes
-COMMAND_SAYALLONLY=This command only works in all-chat
-COMMAND_SAYTEAMONLY=This command only works in team-chat
-COMMAND_HUMANONLY=Only humans can use this command
-COMMAND_ZOMBIEONLY=Only zombies can use this command
-COMMAND_ALIVEONLY=You cannot use this command while dead
-COMMAND_DEADONLY=This command only works while you're dead
-COMMAND_BLOCKED=You are not allowed to use this command right now
-COMMAND_ADMINFLAGS=You don't have the requires access level for this command
+CMDS=Commands
+CMD_PREFIXES=Command Prefixes
+
+CMD_NAME_SHORT=ZM
+CMD_BAD_TEAM=This command can only be used by
+CMD_UNASSIGNED=unassigned
+CMD_TERRORISTS=zombies
+CMD_CTS=humans
+CMD_SPECTATORS=spectators
+
+CMD_SAYALL_ONLY=This command only works in all-chat
+CMD_SAYTEAM_ONLY=This command only works in team-chat
+CMD_ALIVE_ONLY=You cannot use this command while dead
+CMD_DEAD_ONLY=This command only works while you're dead
+CMD_NO_ACCESS=You don't have the requires access level for this command
+CMD_BLOCKED=The command you entered was blocked
