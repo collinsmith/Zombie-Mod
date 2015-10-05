@@ -105,10 +105,9 @@ stock CsTeams: getTeamForFlag(const flag) {
         case FLAG_TEAM_T:          return CS_TEAM_T;
         case FLAG_TEAM_CT:         return CS_TEAM_CT;
         case FLAG_TEAM_SPECTATOR:  return CS_TEAM_SPECTATOR;
-        default:                   assert false;
     }
 
-    return FLAG_TEAM_UNASSIGNED;
+    return CS_TEAM_UNASSIGNED;
 }
 
 stock getFlagForTeam(const flag) {
@@ -117,7 +116,6 @@ stock getFlagForTeam(const flag) {
         case CS_TEAM_T:          return FLAG_TEAM_T;
         case CS_TEAM_CT:         return FLAG_TEAM_CT;
         case CS_TEAM_SPECTATOR:  return FLAG_TEAM_SPECTATOR;
-        default:                 assert false;
     }
 
     return 0;
