@@ -1,10 +1,17 @@
 [en]
-COMMANDS=Commands
-COMMAND_PREFIXES=Command Prefixes
-COMMAND_SAYALL_ONLY=This command only works in all-chat
-COMMAND_SAYTEAM_ONLY=This command only works in team-chat
-COMMAND_ALIVE_ONLY=You cannot use this command while dead
-COMMAND_DEAD_ONLY=This command only works while you're dead
-COMMAND_NO_ACCESS=You don't have the requires access level for this command
-COMMAND_CT_ONLY=Only CTs can use this command
-COMMAND_T_ONLY=Only terrorists can use this command
+CMDS=Commands
+CMD_PREFIXES=Command Prefixes
+
+CMD_NAME_SHORT=CMD
+CMD_BAD_TEAM=This command can only be used by
+CMD_UNASSIGNED=unassigned
+CMD_TERRORISTS=terrorist
+CMD_CTS=CT
+CMD_SPECTATORS=spectators
+
+CMD_SAYALL_ONLY=This command only works in all-chat
+CMD_SAYTEAM_ONLY=This command only works in team-chat
+CMD_ALIVE_ONLY=You cannot use this command while dead
+CMD_DEAD_ONLY=This command only works while you're dead
+CMD_NO_ACCESS=You don't have the requires access level for this command
+CMD_BLOCKED=The command you entered was blocked
