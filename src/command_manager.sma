@@ -40,9 +40,14 @@ stock bool:  operator<=(Alias: alias, other) return any:(alias) <= other;
 stock bool:  operator> (Alias: alias, other) return any:(alias) >  other;
 stock bool:  operator>=(Alias: alias, other) return any:(alias) >= other;
 
-static const CMD_NAME_SHORT[] = "CMD_NAME_SHORT";
-
 static Logger: g_Logger = Invalid_Logger;
+
+static const CMD_TEAM_KEYS[CsTeams][] = {
+    "CMD_UNASSIGNED",
+    "CMD_TERRORISTS",
+    "CMD_CTS",
+    "CMD_SPECTATORS"
+};
 
 enum Forwards {
     fwReturn = 0,
@@ -64,7 +69,7 @@ static Trie: g_aliasesMap;
 static Trie: g_prefixesMap;
 
 static g_szCommandBuffer[192];
-static g_szHandlerError[192];
+static g_szError[192];
 
 static g_pCvar_Prefixes;
 
@@ -79,7 +84,7 @@ public plugin_precache() {
 public plugin_natives() {
     register_library("command_manager");
 
-    register_native("cmd_setHandlerError", "_setHandlerError", 0);
+    register_native("cmd_setError", "_setError", 0);
 
     register_native("cmd_registerCommand", "_registerCommand", 0);
     register_native("cmd_registerAlias", "_registerAlias", 0);
@@ -328,7 +333,7 @@ tryExecutingCommand(
     new const bool: hasAccess
             = bool:(access(id, g_tempCommand[command_AdminFlags]));
     if (!hasAccess) {
-        cmd_printColor(id, "%L", id, "COMMAND_NO_ACCESS");
+        cmd_printColor(id, "%L", id, "CMD_NO_ACCESS");
         return PLUGIN_HANDLED;
     }
 
@@ -339,12 +344,12 @@ tryExecutingCommand(
         switch (getXorFlag(flags, FLAG_METHOD_SAY, FLAG_METHOD_SAY_TEAM)) {
             case FLAG_METHOD_SAY:
                 if (isTeamCommand) {
-                    cmd_printColor(id, "%L", id, "COMMAND_SAYTEAM_ONLY");
+                    cmd_printColor(id, "%L", id, "CMD_SAYTEAM_ONLY");
                     return PLUGIN_HANDLED;
                 }
             case FLAG_METHOD_SAY_TEAM:
                 if (!isTeamCommand) {
-                    cmd_printColor(id, "%L", id, "COMMAND_SAYALL_ONLY");
+                    cmd_printColor(id, "%L", id, "CMD_SAYALL_ONLY");
                     return PLUGIN_HANDLED;
                 }
         }
@@ -357,27 +362,38 @@ tryExecutingCommand(
         switch (getXorFlag(flags, FLAG_STATE_ALIVE, FLAG_STATE_DEAD)) {
             case FLAG_STATE_ALIVE:
                 if (!isAlive) {
-                    cmd_printColor(id, "%L", id, "COMMAND_DEAD_ONLY");
+                    cmd_printColor(id, "%L", id, "CMD_DEAD_ONLY");
                     return PLUGIN_HANDLED;
                 }
             case FLAG_STATE_DEAD:
                 if (isAlive) {
-                    cmd_printColor(id, "%L", id, "COMMAND_ALIVE_ONLY");
+                    cmd_printColor(id, "%L", id, "CMD_ALIVE_ONLY");
                     return PLUGIN_HANDLED;
                 }
         }
     }
 
     new const CsTeams: team = cs_get_user_team(id);
-    
+    new const teamFlag = getFlagForTeam(team);
+    if (!isFlagSet(flags, teamFlag)) {
+        buildValidTeamsMessage(
+                id,
+                g_szError, charsmax(g_szError),
+                teamFlag,
+                flags);
+        cmd_printColor(id, g_szError);
+        return PLUGIN_HANDLED;
+    }
 
-    g_szHandlerError[0] = EOS;
+    g_szError[0] = EOS;
     ExecuteForward(g_fw[onBeforeCommand], g_fw[fwReturn], id, prefix, command);
     if (g_fw[fwReturn] == PLUGIN_HANDLED) {
-        if (isStringEmpty(g_szHandlerError)) {
-            cmd_printColor(id, "%L", id, "COMMAND_BLOCKED");
+        if (isStringEmpty(g_szError)) {
+            cmd_printColor(id, "%L", id, "CMD_BLOCKED");
+            LoggerLogWarn(g_Logger,
+                    "A command was blocked without a reason given.");
         } else {
-            cmd_printColor(id, g_szHandlerError);
+            cmd_printColor(id, g_szError);
         }
         
         return PLUGIN_HANDLED;
@@ -408,7 +424,7 @@ stock cmd_printColor(const id, const message[], any: ...) {
     static offset;
     if (buffer[0] == EOS) {
         offset = formatex(buffer, PRINT_BUFFER_LENGTH,
-                "[\4%L\1] ", id, CMD_NAME_SHORT);
+                "[\4%L\1] ", id, "CMD_NAME_SHORT");
     }
     
     new length = offset;
@@ -421,6 +437,28 @@ stock cmd_printColor(const id, const message[], any: ...) {
     
     buffer[length] = EOS;
     client_print_color(id, print_team_default, buffer);
+}
+
+stock buildValidTeamsMessage(id, dst[], const len, const teamFlag, const flags) {
+    new CsTeams: team;
+    new list[32], listLen;
+    for (new i = FLAG_TEAM_UNASSIGNED; i <= FLAG_TEAM_SPECTATOR; i++) {
+        if (i == teamFlag) {
+            continue;
+        }
+        
+        if (!isFlagSet(flags, i)) {
+            continue;
+        }
+
+        team = getTeamForFlag(i);
+        listLen += formatex(list[listLen], charsmax(list)-listLen,
+                "%L, ", id, CMD_TEAM_KEYS[team]);
+    }
+    
+    listLen = max(0, listLen-2);
+    list[listLen] = EOS;
+    return formatex(dst, len, "%L %s", id, "CMD_BAD_TEAM", list);
 }
 
 stock bool: isValidCommand({any,Command}: command) {
@@ -721,16 +759,16 @@ public printAliases(id) {
  * Natives
  ******************************************************************************/
 
-// native cmd_setHandlerError(const error[]);
-public _setHandlerError(pluginId, numParams) {
+// native cmd_setError(const error[]);
+public _setError(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return;
     }
 
-    get_string(1, g_szHandlerError, charsmax(g_szHandlerError));
+    get_string(1, g_szError, charsmax(g_szError));
     LoggerLogDebug(g_Logger,
             "Handler error string set to \"%s\"",
-            g_szHandlerError);
+            g_szError);
 }
 
 // native Command: cmd_registerCommand(
