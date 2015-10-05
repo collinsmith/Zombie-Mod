@@ -3,6 +3,8 @@
 #endif
 #define _command_manager_const_included
 
+#include <cstrike>
+
 /*******************************************************************************
  * DEFINITIONS
  ******************************************************************************/
@@ -95,4 +97,14 @@ stock getCustomFlags(const bits, flags[], const len) {
 
     flags[min(len, copyLen-1)+1] = EOS;
     return copyLen;
+}
+
+stock CsTeams: getTeamForFlag(const flag) {
+    switch (flag) {
+        case FLAG_TEAM_UNASSIGNED: return CS_TEAM_UNASSIGNED;
+        case FLAG_TEAM_T:          return CS_TEAM_T;
+        case FLAG_TEAM_CT:         return CS_TEAM_CT;
+        case FLAG_TEAM_SPECTATOR:  return CS_TEAM_SPECTATOR;
+        default:                   assert false;
+    }
 }
