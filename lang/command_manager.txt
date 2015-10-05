@@ -5,8 +5,8 @@ CMD_PREFIXES=Command Prefixes
 CMD_NAME_SHORT=CMD
 CMD_BAD_TEAM=This command can only be used by
 CMD_UNASSIGNED=unassigned
-CMD_TERRORISTS=terrorist
-CMD_CTS=CT
+CMD_TERRORISTS=terrorists
+CMD_CTS=CTs
 CMD_SPECTATORS=spectators
 
 CMD_SAYALL_ONLY=This command only works in all-chat
