@@ -501,7 +501,7 @@ stock loadCommand(Command: command) {
 }
 
 stock commitCommand(Command: command) {
-    ArrayGetArray(g_commandsList, commandToIndex(command), g_tempCommand);
+    ArraySetArray(g_commandsList, commandToIndex(command), g_tempCommand);
     g_Command = command;
     LoggerLogDebug(g_Logger,
             "Committed command %d into g_tempCommand", g_Command);
@@ -523,7 +523,7 @@ stock loadAlias(Alias: alias) {
 }
 
 stock commitAlias(Alias: alias) {
-    ArrayGetArray(g_aliasesList, aliasToIndex(alias), g_tempAlias);
+    ArraySetArray(g_aliasesList, aliasToIndex(alias), g_tempAlias);
     g_Alias = alias;
     LoggerLogDebug(g_Logger, "Committed alias %d into g_tempAlias", g_Alias);
 }
@@ -564,6 +564,8 @@ bindAlias(Alias: alias, Command: command) {
 
     loadAlias(alias);
     g_tempAlias[alias_Command] = command;
+    commitAlias(alias);
+
     loadCommand(command);
     new const Array: aliasesList = g_tempCommand[command_Aliases];
 #if defined COMPILE_FOR_DEBUG
@@ -580,7 +582,6 @@ bindAlias(Alias: alias, Command: command) {
 #if defined COMPILE_FOR_DEBUG
     outputArrayContents(aliasesList);
 #endif
-    commitAlias(alias);
 }
 
 unbindAlias(Alias: alias) {
@@ -822,6 +823,7 @@ public Command: _registerCommand(pluginId, numParams) {
     g_tempCommand[command_FuncID] = funcId;
     g_tempCommand[command_Aliases] = ArrayCreate(1, 2);
     g_Command = ArrayPushArray(g_commandsList, g_tempCommand)+1;
+
     g_numCommands++;
     assert g_numCommands == ArraySize(g_commandsList);
 
@@ -905,7 +907,7 @@ public Command: _getCommandFromAlias(pluginId, numParams) {
     assert isValidAlias(aliasId);
     loadAlias(aliasId);
     new const Command: command = g_tempAlias[alias_Command];
-    LoggerLogDebug(g_Logger,
+    LoggerLogError(g_Logger,
             "cmd_getCommandFromAlias(\"%s\") == %d",
             alias,
             command);
