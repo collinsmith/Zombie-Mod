@@ -16,7 +16,7 @@ static bool: isEqual;
 public plugin_init() {
     register_plugin("Command Manager Tests", VERSION_STRING, "Tirant");
     
-    log_amx("Testing %s", name);
+    log_amx("Testing command_manager");
     tests = passed = 0;
 
     test_registerCommand();
@@ -25,11 +25,11 @@ public plugin_init() {
 }
 
 public handle1(id) {
-    zm_printColor(id, "handle1");
+    client_print_color(id, print_team_default, "handle1");
 }
 
 public handle2(id) {
-    zm_printColor(id, "handle2");
+    client_print_color(id, print_team_default, "handle2");
 }
 
 test(bool: b) {
@@ -40,85 +40,85 @@ test(bool: b) {
 
 test_registerCommand() {
     new numCommands;
-    new ZM_Command: command;
+    new Command: command;
     new alias[32];
     new handle[32];
-    log_amx("Testing zm_registerCommand");
+    log_amx("Testing cmd_registerCommand");
 
     alias = "alias1";
     handle = "handle1";
-    numCommands = zm_getNumCommands();
-    command = zm_registerCommand(alias, handle);
-    log_amx("\tzm_registerCommand(\"%s\", \"%s\") = %d", alias, handle, command);
-    test(numCommands+1 == zm_getNumCommands());
-    log_amx("\t\t%s - numCommands incremented; actual => %d -> %d", TEST[isEqual], numCommands, zm_getNumCommands());
+    numCommands = cmd_getNumCommands();
+    command = cmd_registerCommand(alias, handle);
+    log_amx("\tcmd_registerCommand(\"%s\", \"%s\") = %d", alias, handle, command);
+    test(numCommands+1 == cmd_getNumCommands());
+    log_amx("\t\t%s - numCommands incremented; actual => %d -> %d", TEST[isEqual], numCommands, cmd_getNumCommands());
     test(command > Invalid_Command);
     log_amx("\t\t%s - command > Invalid_Command; actual => %d > %d", TEST[isEqual], command, Invalid_Command);
-    test(command == zm_getCommandFromAlias(alias));
-    log_amx("\t\t%s - command == zm_getCommandFromAlias(alias); actual => %d == %d", TEST[isEqual], command, zm_getCommandFromAlias(alias));
+    test(command == cmd_getCommandFromAlias(alias));
+    log_amx("\t\t%s - command == cmd_getCommandFromAlias(alias); actual => %d == %d", TEST[isEqual], command, cmd_getCommandFromAlias(alias));
     
     alias = "alias2";
     handle = "handle2";
-    numCommands = zm_getNumCommands();
-    command = zm_registerCommand(alias, handle);
-    log_amx("\tzm_registerCommand(\"%s\", \"%s\") = %d", alias, handle, command);
-    test(numCommands+1 == zm_getNumCommands());
-    log_amx("\t\t%s - numCommands incremented; actual => %d -> %d", TEST[isEqual], numCommands, zm_getNumCommands());
+    numCommands = cmd_getNumCommands();
+    command = cmd_registerCommand(alias, handle);
+    log_amx("\tcmd_registerCommand(\"%s\", \"%s\") = %d", alias, handle, command);
+    test(numCommands+1 == cmd_getNumCommands());
+    log_amx("\t\t%s - numCommands incremented; actual => %d -> %d", TEST[isEqual], numCommands, cmd_getNumCommands());
     test(command > Invalid_Command);
     log_amx("\t\t%s - command > Invalid_Command; actual => %d > %d", TEST[isEqual], command, Invalid_Command);
-    test(command == zm_getCommandFromAlias(alias));
-    log_amx("\t\t%s - command == zm_getCommandFromAlias(alias); actual => %d == %d", TEST[isEqual], command, zm_getCommandFromAlias(alias));
+    test(command == cmd_getCommandFromAlias(alias));
+    log_amx("\t\t%s - command == cmd_getCommandFromAlias(alias); actual => %d == %d", TEST[isEqual], command, cmd_getCommandFromAlias(alias));
     
     test_registerAlias();
 }
 
 test_registerAlias() {
     new numAliases;
-    new ZM_Alias: alias;
-    new ZM_Command: command;
-    new ZM_Command: command2;
+    new Alias: alias;
+    new Command: command;
+    new Command: command2;
     new alias1[32];
     new alias2[32];
     new alias3[32];
-    log_amx("Testing zm_registerAlias");
+    log_amx("Testing cmd_registerAlias");
 
     alias1 = "alias1";
     alias2 = "alias2";
-    test(zm_getCommandFromAlias(alias1) != (command2 = zm_getCommandFromAlias(alias2)));
-    log_amx("\t%s - zm_getCommandFromAlias(\"%s\") != zm_getCommandFromAlias(\"%s\"); \
+    test(cmd_getCommandFromAlias(alias1) != (command2 = cmd_getCommandFromAlias(alias2)));
+    log_amx("\t%s - cmd_getCommandFromAlias(\"%s\") != cmd_getCommandFromAlias(\"%s\"); \
             actual => %d != %d", TEST[isEqual],
             alias1, alias2,
-            zm_getCommandFromAlias(alias1), zm_getCommandFromAlias(alias2));
-    command = zm_getCommandFromAlias(alias1);
-    alias = zm_registerAlias(command, alias2);
-    log_amx("\t%s - zm_registerAlias(%d, \"%s\") = %d;", TEST[isEqual],
+            cmd_getCommandFromAlias(alias1), cmd_getCommandFromAlias(alias2));
+    command = cmd_getCommandFromAlias(alias1);
+    alias = cmd_registerAlias(command, alias2);
+    log_amx("\t%s - cmd_registerAlias(%d, \"%s\") = %d;", TEST[isEqual],
             command, alias2, alias);
-    test(zm_getCommandFromAlias(alias1) == zm_getCommandFromAlias(alias2));
-    log_amx("\t%s - zm_getCommandFromAlias(\"%s\") == zm_getCommandFromAlias(\"%s\"); \
+    test(cmd_getCommandFromAlias(alias1) == cmd_getCommandFromAlias(alias2));
+    log_amx("\t%s - cmd_getCommandFromAlias(\"%s\") == cmd_getCommandFromAlias(\"%s\"); \
             actual => %d == %d", TEST[isEqual],
             alias1, alias2,
-            zm_getCommandFromAlias(alias1), zm_getCommandFromAlias(alias2));
-    new ZM_Alias: t1 = zm_registerAlias(command, alias1);
-    new ZM_Alias: t2 = zm_registerAlias(command, alias1);
+            cmd_getCommandFromAlias(alias1), cmd_getCommandFromAlias(alias2));
+    new Alias: t1 = cmd_registerAlias(command, alias1);
+    new Alias: t2 = cmd_registerAlias(command, alias1);
     test(t1 == t2);
-    log_amx("\t%s - zm_registerAlias(%d, \"%s\") == zm_registerAlias(%d, \"%s\"); \
+    log_amx("\t%s - cmd_registerAlias(%d, \"%s\") == cmd_registerAlias(%d, \"%s\"); \
             actual => %d == %d", TEST[isEqual],
             command, alias1,
             command, alias1,
             t1, t2);
 
     alias3 = "alias3";
-    numAliases = zm_getNumAliases();
-    alias = zm_registerAlias(command2, alias3);
-    log_amx("\tzm_registerAlias(%d, \"%s\") = %d;",
+    numAliases = cmd_getNumAliases();
+    alias = cmd_registerAlias(command2, alias3);
+    log_amx("\tcmd_registerAlias(%d, \"%s\") = %d;",
             command2, alias3, alias);
-    test(numAliases+1 == zm_getNumAliases());
-    log_amx("\t\t%s - numAliases incremented; actual => %d -> %d", TEST[isEqual], numAliases, zm_getNumAliases());
+    test(numAliases+1 == cmd_getNumAliases());
+    log_amx("\t\t%s - numAliases incremented; actual => %d -> %d", TEST[isEqual], numAliases, cmd_getNumAliases());
     test(alias > Invalid_Alias);
     log_amx("\t\t%s - alias > Invalid_Alias; actual => %d > %d", TEST[isEqual], alias, Invalid_Alias);
-    test(zm_getCommandFromAlias(alias3) == command2);
-    log_amx("\t\t%s - zm_getCommandFromAlias(\"%s\") == %d; \
+    test(cmd_getCommandFromAlias(alias3) == command2);
+    log_amx("\t\t%s - cmd_getCommandFromAlias(\"%s\") == %d; \
             actual => %d == %d", TEST[isEqual],
             alias3, command2,
-            zm_getCommandFromAlias(alias3), command2);
+            cmd_getCommandFromAlias(alias3), command2);
 }
