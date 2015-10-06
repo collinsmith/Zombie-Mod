@@ -426,7 +426,7 @@ stock cmd_printColor(const id, const message[], any: ...) {
     static offset;
     if (buffer[0] == EOS) {
         offset = formatex(buffer, PRINT_BUFFER_LENGTH,
-                "[%L] ", id, "CMD_NAME_SHORT");
+                "%L ", id, "CMD_PRINT_COLOR_HEADER", id, "CMD_NAME_SHORT");
     }
     
     new length = offset;
