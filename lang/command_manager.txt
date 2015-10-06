@@ -4,6 +4,7 @@ CMD_PREFIXES=Command Prefixes
 
 CMD_NAME_SHORT=CMD
 CMD_PRINT_COLOR_HEADER=[%L]
+
 CMD_BAD_TEAM=This command can only be used by
 CMD_UNASSIGNED=unassigned
 CMD_TERRORISTS=terrorists
