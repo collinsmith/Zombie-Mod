@@ -627,12 +627,19 @@ unbindAlias(Alias: alias) {
     outputArrayContents(aliasesList);
 #endif
     assert foundAlias;
+    if (ArraySize(aliasesList) == 0) {
+        LoggerLogWarn(g_Logger,
+                "Command %d no longer has any aliases bound to it (leak)!",
+                command);
+    }
+    
     g_tempAlias[alias_Command] = Invalid_Command;
     commitAlias(alias);
     LoggerLogDebug(g_Logger,
-            "Unbound alias %d (\"%s\")",
+            "Unbound alias %d (\"%s\") from command %d",
             alias,
-            g_tempAlias[alias_String]);
+            g_tempAlias[alias_String],
+            command);
 }
 
 Alias: registerAlias(const Command: command, alias[]) {
@@ -926,7 +933,7 @@ public Command: _getCommandFromAlias(pluginId, numParams) {
     return command;
 }
 
-// native bool: cmd_isValidCommand(const Command: command);
+// native bool: cmd_isValidCommand(const {any,Command}: command);
 public bool: _isValidCommand(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return false;
@@ -935,7 +942,7 @@ public bool: _isValidCommand(pluginId, numParams) {
     return isValidCommand(get_param(1));
 }
 
-// native bool: cmd_isValidAlias(const Alias: alias);
+// native bool: cmd_isValidAlias(const {any,Alias}: alias);
 public bool: _isValidAlias(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
         return false;
