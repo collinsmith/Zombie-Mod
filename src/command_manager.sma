@@ -69,7 +69,9 @@ static Trie: g_aliasesMap;
 static Trie: g_prefixesMap;
 
 static g_szCommandBuffer[192];
+
 static g_szError[192];
+static bool: isOnBeforeCommand;
 
 static g_pCvar_Prefixes;
 
@@ -390,7 +392,9 @@ tryExecutingCommand(
     }
 
     g_szError[0] = EOS;
+    isOnBeforeCommand = true;
     ExecuteForward(g_fw[onBeforeCommand], g_fw[fwReturn], id, prefix, command);
+    isOnBeforeCommand = false;
     if (g_fw[fwReturn] == PLUGIN_HANDLED) {
         if (isStringEmpty(g_szError)) {
             cmd_printColor(id, "%L", id, "CMD_BLOCKED");
@@ -766,6 +770,12 @@ public printAliases(id) {
 // native cmd_setError(const error[]);
 public _setError(pluginId, numParams) {
     if (!numParamsEqual(g_Logger, 1, numParams)) {
+        return;
+    }
+
+    if (!isOnBeforeCommand) {
+        LoggerLogError(g_Logger, "Cannot set error message for command outside \
+                of cmd_onBeforeCommand forward");
         return;
     }
 
