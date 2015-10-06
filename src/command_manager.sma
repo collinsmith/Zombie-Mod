@@ -177,6 +177,7 @@ createOnBeforeCommand() {
     g_fw[onBeforeCommand] = CreateMultiForward("cmd_onBeforeCommand",
             ET_CONTINUE,
             FP_CELL, 
+            FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
             "g_fw[onBeforeCommand] = %d",
@@ -187,6 +188,7 @@ createOnCommand() {
     LoggerLogDebug(g_Logger, "Creating forward cmd_onCommand");
     g_fw[onCommand] = CreateMultiForward("cmd_onCommand",
             ET_IGNORE,
+            FP_CELL, 
             FP_CELL, 
             FP_CELL);
     LoggerLogDebug(g_Logger,
@@ -373,7 +375,7 @@ tryExecutingCommand(
         }
     }
 
-    new const CsTeams: team = cs_get_user_team(id);
+    new const CsTeams: team = CsTeams:(get_user_team(id));
     new const teamFlag = getFlagForTeam(team);
     if (!isFlagSet(flags, teamFlag)) {
         buildValidTeamsMessage(
@@ -424,7 +426,7 @@ stock cmd_printColor(const id, const message[], any: ...) {
     static offset;
     if (buffer[0] == EOS) {
         offset = formatex(buffer, PRINT_BUFFER_LENGTH,
-                "[\4%L\1] ", id, "CMD_NAME_SHORT");
+                "[%L] ", id, "CMD_NAME_SHORT");
     }
     
     new length = offset;
@@ -456,8 +458,7 @@ stock buildValidTeamsMessage(id, dst[], const len, const teamFlag, const flags) 
                 "%L, ", id, CMD_TEAM_KEYS[team]);
     }
     
-    listLen = max(0, listLen-2);
-    list[listLen] = EOS;
+    list[max(0, listLen-2)] = EOS;
     return formatex(dst, len, "%L %s", id, "CMD_BAD_TEAM", list);
 }
 
@@ -813,7 +814,8 @@ public Command: _registerCommand(pluginId, numParams) {
     new flags[32];
     get_string(3, flags, charsmax(flags));
     new const bits = readCustomFlags(flags);
-
+    LoggerLogDebug(g_Logger, "Flags = %s %X", flags, bits);
+    
     new const adminFlags = get_param(5);
     
     get_string(4, g_tempCommand[command_Desc], command_Desc_length);
