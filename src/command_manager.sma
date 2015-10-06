@@ -443,7 +443,7 @@ stock cmd_printColor(const id, const message[], any: ...) {
 
 stock buildValidTeamsMessage(id, dst[], const len, const teamFlag, const flags) {
     new CsTeams: team;
-    new list[32], listLen;
+    new list[64], listLen;
     for (new i = FLAG_TEAM_UNASSIGNED; i <= FLAG_TEAM_SPECTATOR; i++) {
         if (i == teamFlag) {
             continue;
