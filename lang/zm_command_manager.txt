@@ -3,6 +3,8 @@ CMDS=Commands
 CMD_PREFIXES=Command Prefixes
 
 CMD_NAME_SHORT=ZM
+CMD_PRINT_COLOR_HEADER=[%L]
+
 CMD_BAD_TEAM=This command can only be used by
 CMD_UNASSIGNED=unassigned
 CMD_TERRORISTS=zombies

@@ -40,11 +40,11 @@ stock zm_registerConCmd(
 /**
  * Constant value storing the header for the print color messages.
  */
-stock const PRINT_COLOR_HEADER[] = "[\4%L\1] ";
+stock const ZM_PRINT_COLOR_HEADER[] = "ZM_PRINT_COLOR_HEADER";//"[%L] ";
 
 /**
- * Copies {@link #PRINT_COLOR_HEADER} into the specified buffer for a max number
- * of bytes.
+ * Copies {@link #ZM_PRINT_COLOR_HEADER} into the specified buffer for a max
+ * number of bytes.
  *
  * @param dst Destination buffer to copy into
  * @param len Number of bytes to copy, e.g., {@code sizeof {@param dst} - 1}
@@ -52,18 +52,18 @@ stock const PRINT_COLOR_HEADER[] = "[\4%L\1] ";
  * @return Number of bytes copied
  */
 stock zm_getPrintColorHeader(dst[], len) {
-    return copy(dst, len, PRINT_COLOR_HEADER);
+    return copy(dst, len, ZM_PRINT_COLOR_HEADER);
 }
 
 /**
  * Returns the usable size of the buffer within a print color message. The value
  * of this function will be equal to {@code {@link #ZM_PRINT_BUFFER_LENGTH} -
- * sizeof {@link #PRINT_COLOR_HEADER}.
+ * sizeof {@link #ZM_PRINT_COLOR_HEADER}.
  *
  * @return Usable number of bytes within a print color message.
  */
 stock zm_getPrintColorBufferLength() {
-    return ZM_PRINT_BUFFER_LENGTH - sizeof PRINT_COLOR_HEADER;
+    return ZM_PRINT_BUFFER_LENGTH - sizeof ZM_PRINT_COLOR_HEADER;
 }
 
 /**
@@ -76,9 +76,10 @@ stock zm_printColor(const id, const message[], any: ...) {
     static buffer[ZM_PRINT_BUFFER_LENGTH+1];
     static offset;
     if (buffer[0] == EOS) {
-        offset = formatex(buffer, ZM_PRINT_BUFFER_LENGTH,
-                PRINT_COLOR_HEADER,
-                LANG_SERVER, ZM_NAME_SHORT);
+        offset = format(buffer, ZM_PRINT_BUFFER_LENGTH,
+                "%L ",
+                id, ZM_PRINT_COLOR_HEADER,
+                id, ZM_NAME_SHORT);
     }
     
     new length = offset;

@@ -15,6 +15,8 @@
 #include "include\\stocks\\string_stocks.inc"
 #include "include\\stocks\\dynamic_param_stocks.inc"
 
+#include "include\\commandmanager\\command_manager.inc"
+
 static Logger: g_Logger = Invalid_Logger;
 
 #pragma unused g_pCvar_Version
@@ -78,6 +80,12 @@ public plugin_precache() {
         LoggerLogDebug(g_Logger, "ZM_CFG_FILE=%s", temp);
     }
 
+    registerConCmds();
+
+    zm_onPrecache();
+}
+
+registerConCmds() {
     zm_registerConCmd(
             .command = "version",
             .function = "printVersion",
@@ -96,13 +104,13 @@ public plugin_precache() {
             .function = "printExtensions",
             .description = "Prints the list of registered extensions",
             .logger = g_Logger);
-
-    zm_onPrecache();
 }
 
 public plugin_init() {
     zm_onInit();
     zm_onExtensionInit();
+
+    cmd_registerCommand("version", "cmd_printVersion");
 }
 
 public plugin_cfg() {
@@ -155,6 +163,21 @@ executeZMCfg() {
     zm_getConfigsFilePath(configFile);
     LoggerLogDebug(g_Logger, "Executing %s", configFile);
     server_cmd("exec %s", configFile);
+}
+
+/*******************************************************************************
+ * Chat Commands
+ ******************************************************************************/
+
+public cmd_printVersion(id) {
+    new buildId[32];
+    zm_getBuildId(buildId);
+    zm_printColor(id,
+            "%L (%L) v%s",
+            LANG_PLAYER, ZM_NAME,
+            LANG_PLAYER, ZM_NAME_SHORT,
+            buildId);
+    return PLUGIN_HANDLED;
 }
 
 /*******************************************************************************
