@@ -855,7 +855,6 @@ public Command: _registerCommand(pluginId, numParams) {
                 ET_IGNORE,
                 FP_CELL,
                 FP_STRING,
-                FP_STRING,
                 FP_CELL,
                 FP_STRING,
                 FP_CELL);
@@ -868,7 +867,6 @@ public Command: _registerCommand(pluginId, numParams) {
     ExecuteForward(g_fw[onCommandRegistered], g_fw[fwReturn],
             g_Command,
             alias,
-            handle,
             bits,
             g_tempCommand[command_Desc],
             adminFlags);
