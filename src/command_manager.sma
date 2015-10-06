@@ -175,7 +175,7 @@ createForwards() {
 createOnBeforeCommand() {
     LoggerLogDebug(g_Logger, "Creating forward cmd_onBeforeCommand");
     g_fw[onBeforeCommand] = CreateMultiForward("cmd_onBeforeCommand",
-            ET_CONTINUE,
+            ET_STOP,
             FP_CELL, 
             FP_CELL, 
             FP_CELL);
