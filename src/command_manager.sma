@@ -407,14 +407,14 @@ tryExecutingCommand(
         return PLUGIN_HANDLED;
     }
     
-    trim(args);
     new name[32];
-    argbreak(
+    argparse(args, 0, name, charsmax(name));
+    /*argbreak(
             args[1],
             name,
             charsmax(name),
             args,
-            len);
+            len);*/
 
     new const player = cmd_target(id, name, CMDTARGET_ALLOW_SELF);
     callfunc_begin_i(g_tempCommand[command_FuncID], g_tempCommand[command_PluginID]); {
