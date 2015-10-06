@@ -213,10 +213,12 @@ public cvar_onPrefixesAltered(pCvar, const oldValue[], const newValue[]) {
             newValue);
     
     new i = 0;
+    new ch;
     new temp[2];
     while (newValue[i] != EOS) {
-        temp[0] = newValue[i];
-        TrieSetCell(g_prefixesMap, temp, i);
+        ch = newValue[i];
+        temp[0] = ch;
+        TrieSetCell(g_prefixesMap, temp, ch);
         i++;
     }
     
