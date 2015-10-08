@@ -226,21 +226,21 @@ createOnAfterCured() {
 }
 
 public client_putinserver(id) {
-    setFlag(g_flagConnected, id);
+    setFlag(g_Logger, g_flagConnected, id);
 }
 
 public client_disconnect(id) { //Ignoreable: warning 233: recursive function "client_disconnect"
-    unsetFlag(g_flagConnected, id);
-    unsetFlag(g_flagAlive, id);
+    unsetFlag(g_Logger, g_flagConnected, id);
+    unsetFlag(g_Logger, g_flagAlive, id);
 }
 
 public ham_onSpawn_Post(id) {
     if (!is_user_alive(id)) {
-        unsetFlag(g_flagAlive, id);
+        unsetFlag(g_Logger, g_flagAlive, id);
         return HAM_IGNORED;
     }
     
-    setFlag(g_flagAlive, id);
+    setFlag(g_Logger, g_flagAlive, id);
     new bool: isZombie = isUserZombie(id);
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, isZombie ? TRUE : FALSE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, isZombie);
@@ -255,7 +255,7 @@ public ham_onKilled(killer, victim, shouldgib) {
     }
     
     //hideMenus(victim);
-    unsetFlag(g_flagAlive, victim);
+    unsetFlag(g_Logger, g_flagAlive, victim);
     LoggerLogDebug(g_Logger, "Calling zm_onKilled(killer=%d, victim=%d) for %N", killer, victim, victim);
     ExecuteForward(g_fw[onKilled], g_fw[fwReturn], killer, victim);
     return HAM_HANDLED;
@@ -283,17 +283,17 @@ public msg_onTeamInfo(const msgId, const msgDest, const entId) {
 
 bool: isUserConnected(const id) {
     assert isValidId(id);
-    return isFlagSet(g_flagConnected, id);
+    return isFlagSet(g_Logger, g_flagConnected, id);
 }
 
 bool: isUserAlive(const id) {
     assert isValidId(id);
-    return isFlagSet(g_flagAlive, id);
+    return isFlagSet(g_Logger, g_flagAlive, id);
 }
 
 bool: isUserZombie(const id) {
     assert isValidId(id);
-    return isFlagSet(g_flagZombie, id);
+    return isFlagSet(g_Logger, g_flagZombie, id);
 }
 
 bool: isUserHuman(const id) {
@@ -332,7 +332,7 @@ ZM_State_Change: infect(const id, const infector = -1, const bool: blockable = t
     LoggerLogDebug(g_Logger, "Calling zm_onInfected(%d, %d) for %N", id, infector, id);
     ExecuteForward(g_fw[onInfected], g_fw[fwReturn], id, infector);
 
-    setFlag(g_flagZombie, id);
+    setFlag(g_Logger, g_flagZombie, id);
     cs_set_team_id(id, ZM_TEAM_ZOMBIE);
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, TRUE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, true);
@@ -374,7 +374,7 @@ ZM_State_Change: cure(const id, const curor = -1, const bool: blockable = true) 
     LoggerLogDebug(g_Logger, "Calling zm_onCured(%d, %d) for %N", id, curor, id);
     ExecuteForward(g_fw[onCured], g_fw[fwReturn], id, curor);
 
-    setFlag(g_flagZombie, id);
+    setFlag(g_Logger, g_flagZombie, id);
     cs_set_team_id(id, ZM_TEAM_HUMAN);
     LoggerLogDebug(g_Logger, "Calling zm_onApply(%d, isZombie=%s) for %N", id, FALSE, id);
     ExecuteForward(g_fw[onApply], g_fw[fwReturn], id, false);
