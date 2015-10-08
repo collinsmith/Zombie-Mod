@@ -344,10 +344,10 @@ tryExecutingCommand(
     }
 
     new const flags = g_tempCommand[command_Flags];
-    if (!areFlagsSet(flags, FLAG_METHOD_SAY, FLAG_METHOD_SAY_TEAM)) {
+    if (!areFlagsSet(g_Logger, flags, FLAG_METHOD_SAY, FLAG_METHOD_SAY_TEAM)) {
         return PLUGIN_CONTINUE;
     } else {
-        switch (getXorFlag(flags, FLAG_METHOD_SAY, FLAG_METHOD_SAY_TEAM)) {
+        switch (getXorFlag(g_Logger, flags, FLAG_METHOD_SAY, FLAG_METHOD_SAY_TEAM)) {
             case FLAG_METHOD_SAY:
                 if (isTeamCommand) {
                     cmd_printColor(id, "%L", id, "CMD_SAYTEAM_ONLY");
@@ -361,11 +361,11 @@ tryExecutingCommand(
         }
     }
 
-    if (!areFlagsSet(flags, FLAG_STATE_ALIVE, FLAG_STATE_DEAD)) {
+    if (!areFlagsSet(g_Logger, flags, FLAG_STATE_ALIVE, FLAG_STATE_DEAD)) {
         return PLUGIN_CONTINUE;
     } else {
         new const bool: isAlive = bool:(is_user_alive(id));
-        switch (getXorFlag(flags, FLAG_STATE_ALIVE, FLAG_STATE_DEAD)) {
+        switch (getXorFlag(g_Logger, flags, FLAG_STATE_ALIVE, FLAG_STATE_DEAD)) {
             case FLAG_STATE_ALIVE:
                 if (!isAlive) {
                     cmd_printColor(id, "%L", id, "CMD_DEAD_ONLY");
@@ -381,7 +381,7 @@ tryExecutingCommand(
 
     new const CsTeams: team = CsTeams:(get_user_team(id));
     new const teamFlag = getFlagForTeam(team);
-    if (!isFlagSet(flags, teamFlag)) {
+    if (!isFlagSet(g_Logger, flags, teamFlag)) {
         buildValidTeamsMessage(
                 id,
                 g_szError, charsmax(g_szError),
@@ -455,7 +455,7 @@ stock buildValidTeamsMessage(id, dst[], const len, const teamFlag, const flags) 
             continue;
         }
         
-        if (!isFlagSet(flags, i)) {
+        if (!isFlagSet(g_Logger, flags, i)) {
             continue;
         }
 
@@ -705,8 +705,8 @@ Alias: registerAlias(const Command: command, alias[]) {
 }
 
 stock checkFlags(const bits, const Command: command, const alias[]) {
-    if (!isFlagSet(bits, FLAG_METHOD_SAY)
-            && !isFlagSet(bits, FLAG_METHOD_SAY_TEAM)) {
+    if (!isFlagSet(g_Logger, bits, FLAG_METHOD_SAY)
+            && !isFlagSet(g_Logger, bits, FLAG_METHOD_SAY_TEAM)) {
         LoggerLogWarn(g_Logger,
                 "Command %d with alias \"%s\" does not have a flag specifying \
                 a say method which activates it ('%c' for 'say' and/or \
@@ -717,8 +717,8 @@ stock checkFlags(const bits, const Command: command, const alias[]) {
                 FLAG_METHOD_SAY_TEAM_CH);
     }
 
-    if (!isFlagSet(bits, FLAG_STATE_ALIVE)
-            && !isFlagSet(bits, FLAG_STATE_DEAD)) {
+    if (!isFlagSet(g_Logger, bits, FLAG_STATE_ALIVE)
+            && !isFlagSet(g_Logger, bits, FLAG_STATE_DEAD)) {
         LoggerLogWarn(g_Logger,
                 "Command %d with alias \"%s\" does not have a flag specifying \
                 a state which a player must be in order to activate it ('%c' \
@@ -729,10 +729,7 @@ stock checkFlags(const bits, const Command: command, const alias[]) {
                 FLAG_STATE_DEAD_CH);
     }
 
-    if (!isFlagSet(bits, FLAG_TEAM_UNASSIGNED)
-            && !isFlagSet(bits, FLAG_TEAM_T)
-            && !isFlagSet(bits, FLAG_TEAM_CT)
-            && !isFlagSet(bits, FLAG_TEAM_SPECTATOR)) {
+    if (areFlagsNotSet(g_Logger, bits, FLAG_TEAM_UNASSIGNED, FLAG_TEAM_T, FLAG_TEAM_CT, FLAG_TEAM_SPECTATOR)) {
         LoggerLogWarn(g_Logger,
                 "Command %d with alias \"%s\" does not have a flag specifying \
                 a team which a player must be on in order to activate it \
@@ -746,8 +743,8 @@ stock checkFlags(const bits, const Command: command, const alias[]) {
                 FLAG_TEAM_SPECTATOR_CH);
     }
 
-    if (!isFlagSet(bits, FLAG_STATE_DEAD)
-            && isFlagSet(bits, FLAG_TEAM_SPECTATOR)) {
+    if (!isFlagSet(g_Logger, bits, FLAG_STATE_DEAD)
+            && isFlagSet(g_Logger, bits, FLAG_TEAM_SPECTATOR)) {
         LoggerLogWarn(g_Logger,
                 "Command %d with alias \"%s\" specifies a player must be a \
                 spectator ('%c'), however the dead flag ('%c') is not set",
@@ -832,7 +829,7 @@ public Command: _registerCommand(pluginId, numParams) {
 
     new flags[32];
     get_string(3, flags, charsmax(flags));
-    new const bits = readCustomFlags(flags);
+    new const bits = readCustomFlags(flags, g_Logger);
     LoggerLogDebug(g_Logger, "Flags = %s %X", flags, bits);
     
     new const adminFlags = get_param(5);
