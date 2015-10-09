@@ -3,7 +3,7 @@
 #include <amxmodx>
 #include <logger>
 
-#include "include\\commandmanager\\command_manager.inc"
+#include "include\\commandmanager-inc\\command_manager.inc"
 
 static const TEST[][] = {
     "FAILED",

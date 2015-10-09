@@ -10,9 +10,9 @@
 #include <cstrike>
 #include <logger>
 
-#include "include\\commandmanager\\alias_t.inc"
-#include "include\\commandmanager\\command_t.inc"
-#include "include\\commandmanager\\command_manager_const.inc"
+#include "include\\commandmanager-inc\\alias_t.inc"
+#include "include\\commandmanager-inc\\command_t.inc"
+#include "include\\commandmanager-inc\\command_manager_const.inc"
 
 #include "include\\stocks\\dynamic_param_stocks.inc"
 #include "include\\stocks\\flag_stocks.inc"
